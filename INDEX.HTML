@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DIVNE UNIFORM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f3ef;
+      --white: #ffffff;
+      --border: #dedad3;
+      --border-dark: #b8b2a8;
+      --text: #1a1814;
+      --muted: #7a756e;
+      --red: #c0392b;
+      --red-light: #f9eeec;
+      --tag-bg: #1a1814;
+      --tag-text: #f5f3ef;
+      --accent: #c0392b;
+      --success: #2d6a4f;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 20px 60px;
+    }
+
+    /* Top banner */
+    .top-banner {
+      background: var(--text);
+      color: var(--bg);
+      text-align: center;
+      padding: 6px 20px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0;
+    }
+
+    .page-header {
+      background: var(--white);
+      border-bottom: 3px solid var(--text);
+      padding: 28px 40px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .brand span { color: var(--red); }
+
+    .page-sub {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .form-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* Steps indicator */
+    .steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      background: var(--white);
+      border: 1px solid var(--border);
+    }
+
+    .step {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      cursor: default;
+      opacity: 0.4;
+      transition: opacity 0.3s;
+    }
+    .step:last-child { border-right: none; }
+    .step.active { opacity: 1; }
+    .step.done { opacity: 0.7; }
+
+    .step-num {
+      width: 26px; height: 26px;
+      border: 2px solid var(--text);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      flex-shrink: 0;
+    }
+    .step.active .step-num {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .step.done .step-num {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+    .step-label { font-size: 12px; font-weight: 500; }
+
+    /* Sections */
+    .section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+      display: none;
+    }
+    .section.active { display: block; }
+
+    .section-head {
+      background: var(--text);
+      color: var(--bg);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .section-icon {
+      font-size: 18px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+    }
+
+    .section-body {
+      padding: 28px 24px;
+    }
+
+    /* Fields */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .field-grid.col3 { grid-template-columns: 1fr 1fr 1fr; }
+    .field-grid.full { grid-template-columns: 1fr; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    label .req { color: var(--red); }
+
+    input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 0;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--text);
+    }
+    input.invalid, select.invalid { border-color: var(--red); }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾'; position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%); color: var(--muted);
+      pointer-events: none; font-size: 11px;
+    }
+
+    /* Company cards */
+    .company-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .company-card {
+      border: 2px solid var(--border);
+      padding: 16px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s;
+      user-select: none;
+      position: relative;
+    }
+    .company-card:hover { border-color: var(--text); }
+    .company-card.selected {
+      border-color: var(--text);
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .company-logo {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+    .logo-iocl { background: #ff6600; color: white; }
+    .logo-hp   { background: #003087; color: white; }
+    .logo-bp   { background: #009900; color: white; }
+    .logo-nay  { background: #8B1A1A; color: white; }
+
+    .company-card.selected .company-logo { opacity: 0.9; }
+
+    .company-name { font-weight: 600; font-size: 15px; }
+    .company-sub { font-size: 11px; opacity: 0.6; }
+
+    .check-badge {
+      position: absolute; top: 10px; right: 12px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--bg); color: var(--text);
+      display: none; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+    .company-card.selected .check-badge { display: flex; }
+
+    /* Uniform builder */
+    .uniform-block {
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      display: none;
+    }
+    .uniform-block.visible { display: block; }
+
+    .uniform-head {
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .uh-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .uh-name { font-weight: 600; font-size: 14px; letter-spacing: 0.03em; }
+
+    .uniform-body { padding: 16px 18px; }
+
+    /* Garment rows */
+    .garment-row {
+      display: grid;
+      grid-template-columns: 28px 200px 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .garment-row:last-child { border-bottom: none; }
+
+    .garment-check { width: 18px; height: 18px; accent-color: var(--text); cursor: pointer; }
+    .garment-label { font-size: 13px; font-weight: 500; }
+
+    .size-tabs {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .size-tab {
+      padding: 4px 10px;
+      font-size: 11px; font-weight: 600;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .size-tab.sel {
+      background: var(--text); color: var(--bg); border-color: var(--text);
+    }
+
+    .qty-wrap {
+      display: flex; align-items: center; gap: 0;
+    }
+    .qty-btn {
+      width: 28px; height: 28px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .qty-btn:hover { background: var(--border); }
+    .qty-num {
+      width: 40px; height: 28px;
+      border-top: 1.5px solid var(--border);
+      border-bottom: 1.5px solid var(--border);
+      border-left: none; border-right: none;
+      text-align: center;
+      font-size: 13px; font-weight: 600;
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .garment-row.disabled .garment-label,
+    .garment-row.disabled .size-tabs,
+    .garment-row.disabled .qty-wrap { opacity: 0.3; pointer-events: none; }
+
+    /* Accessories */
+    .acc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .acc-card {
+      border: 1.5px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .acc-card-header {
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    .acc-card-header:hover { background: #f0ede8; }
+    .acc-card.selected { border-color: var(--red); }
+    .acc-card.selected .acc-card-header { background: var(--red-light); }
+
+    .acc-icon { font-size: 22px; flex-shrink: 0; }
+    .acc-name { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; flex: 1; }
+    .acc-toggle-icon { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+    .acc-card.selected .acc-toggle-icon { transform: rotate(45deg); color: var(--red); }
+
+    /* Per-company rows inside accessory */
+    .acc-company-rows {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: var(--white);
+    }
+    .acc-card.selected .acc-company-rows { display: block; }
+
+    .acc-co-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .acc-co-row:last-child { border-bottom: none; }
+
+    .acc-co-info {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .acc-co-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .acc-co-name {
+      font-size: 12px; font-weight: 600;
+    }
+
+    .acc-qty-wrap { display: flex; align-items: center; gap: 0; }
+    .acc-qty-btn {
+      width: 26px; height: 26px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 15px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600;
+      user-select: none;
+    }
+    .acc-qty-btn:hover { background: var(--border); }
+    .acc-qty-num {
+      width: 38px; height: 26px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      border-left: none; border-right: none;
+      text-align: center; font-size: 12px; font-weight: 600;
+      background: white;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Nav buttons */
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 13px 32px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border: none; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--text);
+      color: var(--text);
+    }
+    .btn-outline:hover { background: var(--text); color: var(--bg); }
+    .btn-primary {
+      background: var(--text); color: var(--bg);
+    }
+    .btn-primary:hover { background: var(--red); }
+    .btn-submit {
+      background: var(--red); color: white;
+    }
+    .btn-submit:hover { background: #a93226; }
+
+    /* Summary */
+    .summary-block {
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .summary-head {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 18px;
+      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .summary-body { padding: 16px 18px; }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { color: var(--muted); }
+    .summary-val { font-weight: 500; }
+
+    /* Success */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 40px;
+      background: var(--white);
+      border: 1px solid var(--border);
+    }
+    .success-screen.visible { display: block; }
+    .success-title { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--success); letter-spacing: 0.05em; }
+    .success-sub { font-size: 15px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+    .success-ref { margin-top: 20px; font-size: 20px; font-weight: 700; color: var(--text); }
+
+    .error-hint { font-size: 11px; color: var(--red); margin-top: 4px; display: none; }
+
+    @media (max-width: 640px) {
+      .page-header { padding: 20px; }
+      .section-body { padding: 20px 16px; }
+      .field-grid { grid-template-columns: 1fr; }
+      .field-grid.col3 { grid-template-columns: 1fr 1fr; }
+      .company-grid { grid-template-columns: 1fr; }
+      .acc-grid { grid-template-columns: 1fr 1fr; }
+      .garment-row { grid-template-columns: 28px 1fr; grid-template-rows: auto auto auto; }
+      .garment-row .size-tabs { grid-column: 1 / -1; }
+      .garment-row .qty-wrap { grid-column: 1 / -1; }
+      .steps .step-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-banner">Uniform & Accessories Order Form — 2026</div>
+
+<div class="page-header">
+  <div>
+    <div class="brand">DIVINE<span>UNIFORM</span></div>
+    <div class="page-sub">Garments & Accessories Requirement Form</div>
+  </div>
+  <div style="font-size:12px; color:var(--muted); text-align:right; line-height:1.8;">
+    Serving: Indian Oil · HP · BP · Nayara<br/>
+    Fill all required fields marked <span style="color:var(--red)">*</span>
+  </div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-label">Customer Details</div>
+    </div>
+    <div class="step" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-label">Uniform Selection</div>
+    </div>
+    <div class="step" id="step3">
+      <div class="step-num">3</div>
+      <div class="step-label">Accessories</div>
+    </div>
+    <div class="step" id="step4">
+      <div class="step-num">4</div>
+      <div class="step-label">Review & Submit</div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Customer Details -->
+  <div class="section active" id="sec1">
+    <div class="section-head">
+      <div class="section-icon">👤</div>
+      <div class="section-title">Customer Details</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="c_name" placeholder="e.g. Ramesh Kumar"/>
+        </div>
+        <div class="field">
+          <label>Company / Organisation <span class="req">*</span></label>
+          <input type="text" id="c_org" placeholder="e.g. Petrol Station Name"/>
+        </div>
+        <div class="field">
+            <label>GST of No. <span class="req">*</span></label>
+            <input type="text" id="c_org" placeholder="07BBKPB"/>
+          </div>
+        <div class="field">
+          <label>WHATSAPP/MOBILE Number <span class="req">*</span></label>
+          <input type="tel" id="c_phone" placeholder="+91 98765 43210"/>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="c_email" placeholder="you@example.com"/>
+        </div>
+      </div>
+      <div class="field-grid full">
+        <div class="field">
+          <label>Delivery Address <span class="req">*</span></label>
+          <textarea id="c_addr" rows="2" placeholder="Street, City, State, PIN Code"></textarea>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Required By Date</label>
+          <input type="text" id="c_date" placeholder="DD/MM/YYYY"/>
+        </div>
+        <div class="field">
+          <label>Order Reference / PO Number</label>
+          <input type="text" id="c_po" placeholder="Optional"/>
+        </div>
+      </div>
+      <div class="nav-row">
+        <div></div>
+        <button class="btn btn-primary" onclick="goStep(2)">Next: Select Uniforms →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Uniform Selection -->
+  <div class="section" id="sec2">
+    <div class="section-head">
+      <div class="section-icon">👕</div>
+      <div class="section-title">Uniform Selection</div>
+    </div>
+    <div class="section-body">
+
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">Select one or more oil companies to order uniforms for. You can order for multiple companies simultaneously.</p>
+
+      <!-- Company selector -->
+      <label style="margin-bottom:10px;display:block;">Select Company / Companies <span class="req">*</span></label>
+      <div class="company-grid" id="companyGrid">
+
+        <div class="company-card" data-co="IOCL" onclick="toggleCompany(this)">
+          <div class="company-logo logo-iocl">IOCL</div>
+          <div>
+            <div class="company-name">Indian Oil</div>
+            <div class="company-sub">IndianOil Corporation Ltd.</div>
+          </div>
+          <div class="check-badge">✓</div>
+        </div>
+
+        <div class="company-card" data-co="HP" onclick="toggleCompany(this)">
+          <div class="company-logo logo-hp">HPCL</div>
+          <div>
+            <div class="company-name">HP</div>
+            <div class="company-sub">Hindustan Petroleum Corp.</div>
+          </div>
+          <div class="check-badge">✓</div>
+        </div>
+
+        <div class="company-card" data-co="BP" onclick="toggleCompany(this)">
+          <div class="company-logo logo-bp">BPCL</div>
+          <div>
+            <div class="company-name">BP</div>
+            <div class="company-sub">Bharat Petroleum Corp.</div>
+          </div>
+          <div class="check-badge">✓</div>
+        </div>
+
+        <div class="company-card" data-co="NAYARA" onclick="toggleCompany(this)">
+          <div class="company-logo logo-nay">NRE</div>
+          <div>
+            <div class="company-name">Nayara Energy</div>
+            <div class="company-sub">Formerly Essar Oil</div>
+          </div>
+          <div class="check-badge">✓</div>
+        </div>
+
+      </div>
+      <div class="error-hint" id="coErr" style="display:none;">⚠ Please select at least one company.</div>
+
+      <div style="height:24px;"></div>
+
+      <!-- Per-company uniform builder -->
+      <div id="uniformBuilders">
+
+        <!-- IOCL -->
+        <div class="uniform-block" id="uni_IOCL">
+          <div class="uniform-head" style="background:#fff5ee; border-bottom:2px solid #ff6600;">
+            <div class="uh-dot" style="background:#ff6600;"></div>
+            <div class="uh-name">Indian Oil — Uniform Requirements</div>
+          </div>
+          <div class="uniform-body" id="garments_IOCL"></div>
+        </div>
+
+        <!-- HP -->
+        <div class="uniform-block" id="uni_HP">
+          <div class="uniform-head" style="background:#eef2ff; border-bottom:2px solid #003087;">
+            <div class="uh-dot" style="background:#003087;"></div>
+            <div class="uh-name">HP — Uniform Requirements</div>
+          </div>
+          <div class="uniform-body" id="garments_HP"></div>
+        </div>
+
+        <!-- BP -->
+        <div class="uniform-block" id="uni_BP">
+          <div class="uniform-head" style="background:#efffef; border-bottom:2px solid #009900;">
+            <div class="uh-dot" style="background:#009900;"></div>
+            <div class="uh-name">BP — Uniform Requirements</div>
+          </div>
+          <div class="uniform-body" id="garments_BP"></div>
+        </div>
+
+        <!-- NAYARA -->
+        <div class="uniform-block" id="uni_NAYARA">
+          <div class="uniform-head" style="background:#fff0f0; border-bottom:2px solid #8B1A1A;">
+            <div class="uh-dot" style="background:#8B1A1A;"></div>
+            <div class="uh-name">Nayara Energy — Uniform Requirements</div>
+          </div>
+          <div class="uniform-body" id="garments_NAYARA"></div>
+        </div>
+
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(3)">Next: Accessories →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Accessories -->
+  <div class="section" id="sec3">
+    <div class="section-head">
+      <div class="section-icon">🎒</div>
+      <div class="section-title">Accessories</div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Select any accessories required and set quantities. All fields are optional.</p>
+
+      <div class="acc-grid" id="accGrid">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="nav-row" style="margin-top:28px;">
+        <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(4)">Review Order →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Summary + Submit -->
+  <div class="section" id="sec4">
+    <div class="section-head">
+      <div class="section-icon">📋</div>
+      <div class="section-title">Review & Submit</div>
+    </div>
+    <div class="section-body">
+
+      <div id="summaryContent"></div>
+
+      <div style="margin-top:20px; padding:14px 18px; background:var(--bg); border:1px solid var(--border); font-size:12px; color:var(--muted); line-height:1.7;">
+        By submitting this form you confirm that the details above are correct. Our team will contact you to confirm the order and discuss delivery timeline.
+      </div>
+
+      <div class="nav-row" style="margin-top:20px;">
+        <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-submit" onclick="submitForm()">✔ Submit Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-title">ORDER RECEIVED!</div>
+    <div class="success-sub">Thank you for submitting your uniform requirement.<br/>Our team will review your order and get in touch within 24–48 hours.</div>
+    <div class="success-ref" id="successRef"></div>
+  </div>
+
+</div>
+
+<script>
+// ——————————————————————————————
+// Data
+// ——————————————————————————————
+const GARMENTS = [
+  { id: 'half_tee',  label: 'Half Sleeve T-Shirt' },
+  { id: 'full_tee',  label: 'Full Sleeve T-Shirt' },
+  { id: 'shirt',     label: 'Shirt' },
+  { id: 'pants',     label: 'Pants' },
+];
+
+const GARMENT_SIZES = {
+  half_tee: { sizes: ['S','M','L','XL','XXL'] },
+  full_tee: { sizes: ['S','M','L','XL','XXL'] },
+  shirt:    { sizes: ['38','40','42','44'] },
+  pants:    { sizes: ['28','30','32','34','36','38','40'] }
+};
+
+
+const ACCESSORIES = [
+  { id: 'id_card',     icon: '🪪', name: 'ID Card' },
+  { id: 'cap',         icon: '🧢', name: 'Cap' },
+  { id: 'whistle',     icon: '📣', name: 'Whistle' },
+  { id: 'shoes',       icon: '👟', name: 'Shoes' },
+  { id: 'belt',        icon: '🟤', name: 'Belt' },
+  { id: 'id_holder',   icon: '📎', name: 'ID Card Holder' },
+];
+
+// State
+const state = {
+  customer: {},
+  companies: [],        // ['IOCL','HP',...]
+  garments: {},         // { IOCL: { half_tee: { sizes: { M:3, L:2 }, enabled: true } } }
+  accessories: {},      // { id_card: { IOCL: 5, HP: 3 }, cap: { IOCL: 2 } }
+};
+
+// ——————————————————————————————
+// Build garment rows per company
+// ——————————————————————————————
+function buildGarmentUI(co) {
+  if (!state.garments[co]) {
+    state.garments[co] = {};
+    GARMENTS.forEach(g => {
+      state.garments[co][g.id] = { enabled: false, sizes: {} };
+    });
+  }
+
+  const container = document.getElementById('garments_' + co);
+  container.innerHTML = '';
+
+  GARMENTS.forEach(g => {
+    const gState = state.garments[co][g.id];
+    const row = document.createElement('div');
+    row.className = 'garment-row' + (gState.enabled ? '' : ' disabled');
+    row.id = `row_${co}_${g.id}`;
+
+    // Checkbox
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'garment-check';
+    cb.checked = gState.enabled;
+    cb.addEventListener('change', () => toggleGarment(co, g.id, cb.checked));
+    row.appendChild(cb);
+
+    // Label
+    const lbl = document.createElement('div');
+    lbl.className = 'garment-label';
+    lbl.textContent = g.label;
+    row.appendChild(lbl);
+
+    // Sizes
+    const sizesDiv = document.createElement('div');
+    sizesDiv.className = 'size-tabs';
+    sizesDiv.id = `sizes_${co}_${g.id}`;
+    GARMENT_SIZES[g.id].sizes.forEach(sz => {
+      const tab = document.createElement('div');
+      tab.className = 'size-tab' + (gState.sizes[sz] ? ' sel' : '');
+      tab.textContent = sz;
+      tab.addEventListener('click', () => {
+        if (!gState.enabled) return;
+        if (gState.sizes[sz]) {
+          delete gState.sizes[sz];
+          tab.classList.remove('sel');
+        } else {
+          gState.sizes[sz] = 1;
+          tab.classList.add('sel');
+        }
+        updateQtyForSize(co, g.id, sz);
+      });
+      sizesDiv.appendChild(tab);
+    });
+    row.appendChild(sizesDiv);
+
+    // Qty (per selected size)
+    const qtyArea = document.createElement('div');
+    qtyArea.id = `qtyarea_${co}_${g.id}`;
+    qtyArea.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;';
+    renderQtyArea(co, g.id, qtyArea, gState);
+    row.appendChild(qtyArea);
+
+    container.appendChild(row);
+  });
+}
+
+function renderQtyArea(co, gid, area, gState) {
+  area.innerHTML = '';
+  const sizes = Object.keys(gState.sizes);
+  if (sizes.length === 0) {
+    area.innerHTML = '<span style="font-size:11px;color:var(--muted);">Select size →</span>';
+    return;
+  }
+  sizes.forEach(sz => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:0;flex-direction:column;gap:2px;';
+
+    const szLabel = document.createElement('div');
+    szLabel.style.cssText = 'font-size:10px;font-weight:600;letter-spacing:0.06em;color:var(--muted);';
+    szLabel.textContent = sz;
+
+    const qWrap = document.createElement('div');
+    qWrap.className = 'qty-wrap';
+
+    const minus = document.createElement('div');
+    minus.className = 'qty-btn';
+    minus.textContent = '−';
+
+    const num = document.createElement('div');
+    num.className = 'qty-num';
+    num.textContent = gState.sizes[sz] || 1;
+
+    const plus = document.createElement('div');
+    plus.className = 'qty-btn';
+    plus.textContent = '+';
+
+    minus.addEventListener('click', () => {
+      let v = parseInt(num.textContent);
+      if (v > 1) { v--; num.textContent = v; gState.sizes[sz] = v; }
+    });
+    plus.addEventListener('click', () => {
+      let v = parseInt(num.textContent);
+      v++; num.textContent = v; gState.sizes[sz] = v;
+    });
+
+    qWrap.appendChild(minus); qWrap.appendChild(num); qWrap.appendChild(plus);
+    wrap.appendChild(szLabel); wrap.appendChild(qWrap);
+    area.appendChild(wrap);
+  });
+}
+
+function updateQtyForSize(co, gid, sz) {
+  const gState = state.garments[co][gid];
+  const area = document.getElementById(`qtyarea_${co}_${gid}`);
+  renderQtyArea(co, gid, area, gState);
+}
+
+function toggleGarment(co, gid, enabled) {
+  const gState = state.garments[co][gid];
+  gState.enabled = enabled;
+  const row = document.getElementById(`row_${co}_${gid}`);
+  if (enabled) { row.classList.remove('disabled'); }
+  else { row.classList.add('disabled'); gState.sizes = {}; buildGarmentUI(co); }
+}
+
+// ——————————————————————————————
+// Company toggle
+// ——————————————————————————————
+function toggleCompany(card) {
+  const co = card.dataset.co;
+  if (card.classList.contains('selected')) {
+    card.classList.remove('selected');
+    state.companies = state.companies.filter(c => c !== co);
+    document.getElementById('uni_' + co).classList.remove('visible');
+  } else {
+    card.classList.add('selected');
+    state.companies.push(co);
+    document.getElementById('uni_' + co).classList.add('visible');
+    buildGarmentUI(co);
+  }
+  document.getElementById('coErr').style.display = state.companies.length === 0 ? 'block' : 'none';
+}
+
+// ——————————————————————————————
+// Accessories
+// ——————————————————————————————
+const CO_META = {
+  IOCL:   { name: 'Indian Oil',    color: '#ff6600' },
+  HP:     { name: 'HP',            color: '#003087' },
+  BP:     { name: 'BP',            color: '#009900' },
+  NAYARA: { name: 'Nayara Energy', color: '#8B1A1A' },
+};
+
+function buildAccessories() {
+  const grid = document.getElementById('accGrid');
+  grid.innerHTML = '';
+
+  ACCESSORIES.forEach(acc => {
+    const isSelected = state.accessories[acc.id] && Object.keys(state.accessories[acc.id]).length > 0;
+    const card = document.createElement('div');
+    card.className = 'acc-card' + (isSelected ? ' selected' : '');
+    card.id = 'acc_' + acc.id;
+
+    // Header (toggle)
+    const header = document.createElement('div');
+    header.className = 'acc-card-header';
+    header.innerHTML = `
+      <div class="acc-icon">${acc.icon}</div>
+      <div class="acc-name">${acc.name}</div>
+      <div class="acc-toggle-icon">+</div>`;
+    header.addEventListener('click', () => toggleAcc(acc.id, card));
+    card.appendChild(header);
+
+    // Per-company rows
+    const coRows = document.createElement('div');
+    coRows.className = 'acc-company-rows';
+    coRows.id = 'accrows_' + acc.id;
+
+    state.companies.forEach(co => {
+      const meta = CO_META[co];
+      const qty = (state.accessories[acc.id] && state.accessories[acc.id][co]) || 1;
+      const row = document.createElement('div');
+      row.className = 'acc-co-row';
+      row.innerHTML = `
+        <div class="acc-co-info">
+          <div class="acc-co-dot" style="background:${meta.color};"></div>
+          <div class="acc-co-name">${meta.name}</div>
+        </div>
+        <div class="acc-qty-wrap">
+          <div class="acc-qty-btn" onclick="accQty('${acc.id}','${co}',-1,event)">−</div>
+          <div class="acc-qty-num" id="accq_${acc.id}_${co}">${qty}</div>
+          <div class="acc-qty-btn" onclick="accQty('${acc.id}','${co}',1,event)">+</div>
+        </div>`;
+      coRows.appendChild(row);
+    });
+
+    card.appendChild(coRows);
+    grid.appendChild(card);
+  });
+}
+
+function toggleAcc(id, card) {
+  if (card.classList.contains('selected')) {
+    card.classList.remove('selected');
+    delete state.accessories[id];
+  } else {
+    card.classList.add('selected');
+    if (!state.accessories[id]) {
+      state.accessories[id] = {};
+      state.companies.forEach(co => { state.accessories[id][co] = 0; });
+    }
+  }
+}
+
+function accQty(id, co, delta, e) {
+  e.stopPropagation();
+  if (!state.accessories[id]) state.accessories[id] = {};
+  let v = (state.accessories[id][co] || 1) + delta;
+  if (v < 1) v = 1;
+  state.accessories[id][co] = v;
+  const el = document.getElementById(`accq_${id}_${co}`);
+  if (el) el.textContent = v;
+}
+
+// ——————————————————————————————
+// Steps
+// ——————————————————————————————
+let currentStep = 1;
+
+function goStep(n) {
+  if (n > currentStep && !validate(currentStep)) return;
+
+  // Update step indicators
+  for (let i = 1; i <= 4; i++) {
+    const s = document.getElementById('step' + i);
+    s.classList.remove('active','done');
+    if (i < n) s.classList.add('done');
+    else if (i === n) s.classList.add('active');
+  }
+
+  // Show section
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec' + n).classList.add('active');
+
+  if (n === 3) buildAccessories();
+  if (n === 4) buildSummary();
+
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ——————————————————————————————
+// Validation
+// ——————————————————————————————
+function validate(step) {
+  if (step === 1) {
+    const name = document.getElementById('c_name').value.trim();
+    const org = document.getElementById('c_org').value.trim();
+    const phone = document.getElementById('c_phone').value.trim();
+    const addr = document.getElementById('c_addr').value.trim();
+    if (!name || !org || !phone || !addr) {
+      alert('Please fill all required fields (Name, Company, Mobile, Address).');
+      return false;
+    }
+    state.customer = { name, org, phone, addr,
+      email: document.getElementById('c_email').value.trim(),
+      date: document.getElementById('c_date').value.trim(),
+      po: document.getElementById('c_po').value.trim() };
+    return true;
+  }
+  if (step === 2) {
+    if (state.companies.length === 0) {
+      document.getElementById('coErr').style.display = 'block';
+      return false;
+    }
+    return true;
+  }
+  return true;
+}
+
+// ——————————————————————————————
+// Summary
+// ——————————————————————————————
+function buildSummary() {
+  const el = document.getElementById('summaryContent');
+  let html = '';
+
+  // Customer
+  html += `<div class="summary-block">
+    <div class="summary-head">Customer Details</div>
+    <div class="summary-body">
+      <div class="summary-row"><span class="summary-key">Name</span><span class="summary-val">${state.customer.name}</span></div>
+      <div class="summary-row"><span class="summary-key">Organisation</span><span class="summary-val">${state.customer.org}</span></div>
+      <div class="summary-row"><span class="summary-key">Mobile</span><span class="summary-val">${state.customer.phone}</span></div>
+      ${state.customer.email ? `<div class="summary-row"><span class="summary-key">Email</span><span class="summary-val">${state.customer.email}</span></div>` : ''}
+      <div class="summary-row"><span class="summary-key">Delivery Address</span><span class="summary-val">${state.customer.addr}</span></div>
+      ${state.customer.date ? `<div class="summary-row"><span class="summary-key">Required By</span><span class="summary-val">${state.customer.date}</span></div>` : ''}
+      ${state.customer.po ? `<div class="summary-row"><span class="summary-key">PO / Reference</span><span class="summary-val">${state.customer.po}</span></div>` : ''}
+    </div>
+  </div>`;
+
+  // Uniforms
+  state.companies.forEach(co => {
+    const coName = { IOCL:'Indian Oil', HP:'HP', BP:'BP', NAYARA:'Nayara Energy' }[co];
+    let rows = '';
+    const gs = state.garments[co] || {};
+    GARMENTS.forEach(g => {
+      const gd = gs[g.id];
+      if (!gd || !gd.enabled) return;
+      const sizes = Object.entries(gd.sizes);
+      if (sizes.length === 0) return;
+      const detail = sizes.map(([sz,qty]) => `${sz}×${qty}`).join(', ');
+      rows += `<div class="summary-row"><span class="summary-key">${g.label}</span><span class="summary-val">${detail}</span></div>`;
+    });
+    if (!rows) rows = `<div class="summary-row" style="color:var(--muted);font-size:12px;">No garments selected.</div>`;
+    html += `<div class="summary-block">
+      <div class="summary-head">${coName} — Uniforms</div>
+      <div class="summary-body">${rows}</div>
+    </div>`;
+  });
+
+  // Accessories
+  const accKeys = Object.keys(state.accessories);
+  if (accKeys.length > 0) {
+    let accRows = '';
+    accKeys.forEach(id => {
+      const acc = ACCESSORIES.find(a => a.id === id);
+      const coEntries = Object.entries(state.accessories[id]);
+      const detail = coEntries.map(([co, qty]) => `${CO_META[co].name}: ${qty}`).join(' · ');
+      accRows += `<div class="summary-row"><span class="summary-key">${acc.icon} ${acc.name}</span><span class="summary-val">${detail}</span></div>`;
+    });
+    html += `<div class="summary-block"><div class="summary-head">Accessories</div><div class="summary-body">${accRows}</div></div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ——————————————————————————————
+// Submit
+// ——————————————————————————————
+function submitForm() {
+  const ref = 'ORD-' + Date.now().toString(36).toUpperCase();
+
+  // Generate WhatsApp message
+  let message = `*DIVINE UNIFORM ORDER* (${ref})%0A%0A`;
+  message += `*Customer:* ${state.customer.name}%0A`;
+  message += `*Org:* ${state.customer.org}%0A`;
+  message += `*Phone:* ${state.customer.phone}%0A`;
+  message += `*Address:* ${state.customer.addr.replace(/\\n/g, '%0A')}%0A`;
+  if (state.customer.email) message += `*Email:* ${state.customer.email}%0A`;
+  if (state.customer.date) message += `*Required By:* ${state.customer.date}%0A`;
+  if (state.customer.po) message += `*PO:* ${state.customer.po}%0A%0A`;
+
+  // Garments
+  state.companies.forEach(co => {
+    const coName = { IOCL:'Indian Oil', HP:'HP', BP:'BP', NAYARA:'Nayara Energy' }[co];
+    const gs = state.garments[co] || {};
+    let gLines = '';
+    GARMENTS.forEach(g => {
+      const gd = gs[g.id];
+      if (!gd?.enabled) return;
+      const sizesStr = Object.entries(gd.sizes).map(([sz,qty]) => `${sz}x${qty}`).join(', ');
+      if (sizesStr) gLines += `• ${g.label}: ${sizesStr}%0A`;
+    });
+    if (gLines) {
+      message += `*${coName} Garments:*%0A${gLines}%0A`;
+    }
+  });
+
+  // Accessories
+  const accKeys = Object.keys(state.accessories);
+  if (accKeys.length > 0) {
+    let accLines = '';
+    accKeys.forEach(id => {
+      const acc = ACCESSORIES.find(a => a.id === id);
+      const qtys = Object.entries(state.accessories[id]).map(([co,q]) => `${CO_META[co].name}: ${q}`).join(', ');
+      accLines += `• ${acc.name}: ${qtys}%0A`;
+    });
+    message += `*Accessories:*%0A${accLines}%0A`;
+  }
+
+  message += `%0A*End of Order ${ref}*`;
+
+  // Open WhatsApp
+  window.open(`https://wa.me/919811417786?text=${message}`);
+
+  // Show success
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.steps').forEach(s => s.style.display = 'none');
+  const ss = document.getElementById('successScreen');
+  ss.classList.add('visible');
+  document.getElementById('successRef').textContent = `Order ${ref} - WhatsApp opened!`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
