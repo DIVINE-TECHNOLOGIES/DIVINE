@@ -163,6 +163,13 @@
     .shoe-qty-btn:hover { background: var(--border); }
     .shoe-qty-num { width: 34px; height: 26px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); border-left: none; border-right: none; text-align: center; font-size: 12px; font-weight: 600; background: white; display: flex; align-items: center; justify-content: center; }
 
+    /* Pricing additions */
+    .qty-input { width: 36px; height: 100%; border: none; background: none; text-align: center; font-size: 13px; font-weight: 600; color: var(--text); }
+    .qty-input:focus { outline: none; background: rgba(255,255,255,0.8); }
+    .price-tag { font-size: 11px; color: var(--success); font-weight: 600; white-space: nowrap; }
+    .total-row { font-weight: 700 !important; font-size: 14px !important; border-top: 2px solid var(--text) !important; padding-top: 8px !important; margin-top: 8px !important; }
+    .grand-total { background: var(--text) !important; color: var(--bg) !important; font-size: 16px !important; font-weight: 700 !important; }
+
     /* Nav */
     .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
     .btn { padding: 13px 32px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.2s; }
@@ -342,6 +349,62 @@
 
 <script>
 // ── Constants ─────────────────────────────────────
+// PRICES (₹ per unit)
+const PRICES = {
+  // Garments (flat per type)
+  half_tee: 350,
+  full_tee: 400,
+  shirt: 650,
+  pants: 550,
+  // Accessories
+  id_card: 80,
+  cap: 120,
+  whistle: 50,
+  shoes: 1200,
+  belt: 200,
+  id_holder: 60
+};
+
+// Helper functions
+function formatINR(n) {
+  return '₹' + n.toLocaleString('en-IN');
+}
+
+function calcGarmentSubtotal(co) {
+  let total = 0;
+  if (!state.garments[co]) return total;
+  Object.entries(state.garments[co]).forEach(([gid, gd]) => {
+    if (!gd.enabled) return;
+    Object.entries(gd.sizes).forEach(([sz, qty]) => {
+      total += qty * PRICES[gid];
+    });
+  });
+  return total;
+}
+
+function calcAccessorySubtotal(accId) {
+  let total = 0;
+  const accData = state.accessories[accId];
+  if (!accData) return total;
+  Object.entries(accData).forEach(([co, data]) => {
+    if (typeof data === 'number') {
+      total += data * PRICES[accId];
+    } else { // shoes: {sz: qty}
+      Object.values(data).forEach(qty => {
+        if (typeof qty === 'number') total += qty * PRICES[accId];
+      });
+    }
+  });
+  return total;
+}
+
+function getGrandTotal() {
+  let total = 0;
+  state.companies.forEach(co => total += calcGarmentSubtotal(co));
+  Object.keys(state.accessories || {}).forEach(id => total += calcAccessorySubtotal(id));
+  return total;
+}
+
 const GARMENTS = [
   { id: 'half_tee', label: 'Half Sleeve T-Shirt' },
   { id: 'full_tee', label: 'Full Sleeve T-Shirt' },
@@ -424,24 +487,58 @@ function buildGarmentUI(co) {
   });
 }
 
-function renderGarmentQtyInto(gs, area) {
+function renderGarmentQtyInto(gs, gid, area) {
   area.innerHTML = '';
   const sizes = Object.keys(gs.sizes);
   if (!sizes.length) { area.innerHTML = '<span style="font-size:11px;color:var(--muted);">Select size →</span>'; return; }
+  const price = PRICES[gid];
   sizes.forEach(sz => {
+    const qty = gs.sizes[sz];
+    const subtotal = qty * price;
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;';
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;width:140px;';
     const szLbl = document.createElement('div');
     szLbl.style.cssText = 'font-size:10px;font-weight:600;color:var(--muted);';
     szLbl.textContent = sz;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:2px;';
     const qw = document.createElement('div'); qw.className = 'qty-wrap';
     const minus = document.createElement('div'); minus.className = 'qty-btn'; minus.textContent = '−';
-    const num   = document.createElement('div'); num.className = 'qty-num'; num.textContent = gs.sizes[sz] || 1;
-    const plus  = document.createElement('div'); plus.className = 'qty-btn'; plus.textContent = '+';
-    minus.addEventListener('click', () => { let v = parseInt(num.textContent); if (v > 1) { v--; num.textContent = v; gs.sizes[sz] = v; } });
-    plus.addEventListener('click',  () => { let v = parseInt(num.textContent); v++; num.textContent = v; gs.sizes[sz] = v; });
-    qw.appendChild(minus); qw.appendChild(num); qw.appendChild(plus);
-    wrap.appendChild(szLbl); wrap.appendChild(qw);
+    const input = document.createElement('input'); input.type = 'number'; input.className = 'qty-input'; input.min = 1; input.value = qty;
+    input.addEventListener('input', () => {
+      let v = parseInt(input.value) || 1;
+      if (v < 1) v = 1;
+      input.value = v;
+      gs.sizes[sz] = v;
+      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+    });
+    const plus = document.createElement('div'); plus.className = 'qty-btn'; plus.textContent = '+';
+    minus.addEventListener('click', () => {
+      let v = parseInt(input.value);
+      if (v > 1) {
+        v--;
+        input.value = v;
+        gs.sizes[sz] = v;
+        priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+      }
+    });
+    plus.addEventListener('click', () => {
+      let v = parseInt(input.value);
+      v++;
+      input.value = v;
+      gs.sizes[sz] = v;
+      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+    });
+    qw.appendChild(minus);
+    qw.appendChild(input);
+    qw.appendChild(plus);
+    row.appendChild(qw);
+    const priceTag = document.createElement('div');
+    priceTag.className = 'price-tag';
+    priceTag.textContent = `×${price} = ${formatINR(subtotal)}`;
+    row.appendChild(priceTag);
+    wrap.appendChild(szLbl);
+    wrap.appendChild(row);
     area.appendChild(wrap);
   });
 }
@@ -449,7 +546,7 @@ function renderGarmentQtyInto(gs, area) {
 function renderGarmentQty(co, gid) {
   const gs = state.garments[co][gid];
   const area = document.getElementById(`qtyarea_${co}_${gid}`);
-  renderGarmentQtyInto(gs, area);
+  renderGarmentQtyInto(gs, gid, area);
 }
 
 function toggleGarment(co, gid, enabled) {
@@ -554,16 +651,8 @@ function buildAccessories() {
         const qty = (accData && accData[co] !== undefined) ? accData[co] : 0;
         const row = document.createElement('div');
         row.className = 'acc-co-row';
-        row.innerHTML = `
-          <div class="acc-co-info">
-            <div class="acc-co-dot" style="background:${meta.color};"></div>
-            <div class="acc-co-name">${meta.name}</div>
-          </div>
-          <div class="acc-qty-wrap">
-            <div class="acc-qty-btn" onclick="accQty('${acc.id}','${co}',-1,event)">−</div>
-            <div class="acc-qty-num" id="accq_${acc.id}_${co}">${qty}</div>
-            <div class="acc-qty-btn" onclick="accQty('${acc.id}','${co}',1,event)">+</div>
-          </div>`;
+    const price = PRICES[acc.id];
+    const subtotal = qty * price;
         coRows.appendChild(row);
       }
     });
@@ -581,17 +670,48 @@ function renderShoeQty(accId, co, area) {
     area.innerHTML = '<span style="font-size:11px;color:var(--muted);margin-top:2px;">← Pick a size above</span>';
     return;
   }
+  const price = PRICES[accId];
   selected.forEach(sz => {
+    const qty = data[sz];
+    const subtotal = qty * price;
     const wrap = document.createElement('div'); wrap.className = 'shoe-size-qty';
-    const tag  = document.createElement('div'); tag.className = 'shoe-sz-tag'; tag.textContent = 'UK ' + sz;
-    const qw   = document.createElement('div'); qw.className = 'shoe-qty-wrap';
+    const tag = document.createElement('div'); tag.className = 'shoe-sz-tag'; tag.textContent = 'UK ' + sz;
+    const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:2px;';
+    const qw = document.createElement('div'); qw.className = 'shoe-qty-wrap';
     const minus = document.createElement('div'); minus.className = 'shoe-qty-btn'; minus.textContent = '−';
-    const num   = document.createElement('div'); num.className = 'shoe-qty-num'; num.textContent = data[sz] || 1;
-    const plus  = document.createElement('div'); plus.className = 'shoe-qty-btn'; plus.textContent = '+';
-    minus.addEventListener('click', e => { e.stopPropagation(); let v = parseInt(num.textContent); if (v > 1) { v--; num.textContent = v; state.accessories[accId][co][sz] = v; } });
-    plus.addEventListener('click',  e => { e.stopPropagation(); let v = parseInt(num.textContent); v++; num.textContent = v; state.accessories[accId][co][sz] = v; });
-    qw.appendChild(minus); qw.appendChild(num); qw.appendChild(plus);
-    wrap.appendChild(tag); wrap.appendChild(qw);
+    const input = document.createElement('input'); input.type = 'number'; input.className = 'qty-input'; input.min = 1; input.value = qty;
+    input.addEventListener('input', e => {
+      e.stopPropagation();
+      let v = parseInt(input.value) || 1;
+      if (v < 1) v = 1;
+      input.value = v;
+      state.accessories[accId][co][sz] = v;
+      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+    });
+    const plus = document.createElement('div'); plus.className = 'shoe-qty-btn'; plus.textContent = '+';
+    minus.addEventListener('click', e => {
+      e.stopPropagation();
+      let v = parseInt(input.value);
+      if (v > 1) {
+        v--;
+        input.value = v;
+        state.accessories[accId][co][sz] = v;
+        priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+      }
+    });
+    plus.addEventListener('click', e => {
+      e.stopPropagation();
+      let v = parseInt(input.value);
+      v++;
+      input.value = v;
+      state.accessories[accId][co][sz] = v;
+      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+    });
+    qw.appendChild(minus); qw.appendChild(input); qw.appendChild(plus);
+    row.appendChild(qw);
+    const priceTag = document.createElement('div'); priceTag.className = 'price-tag'; priceTag.textContent = `×${price} = ${formatINR(subtotal)}`;
+    row.appendChild(priceTag);
+    wrap.appendChild(tag); wrap.appendChild(row);
     area.appendChild(wrap);
   });
 }
@@ -619,6 +739,8 @@ function accQty(id, co, delta, e) {
   state.accessories[id][co] = v;
   const el = document.getElementById(`accq_${id}_${co}`);
   if (el) el.textContent = v;
+  // Trigger rebuild for price display
+  buildAccessories();
 }
 
 // ── Steps ─────────────────────────────────────────
