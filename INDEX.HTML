@@ -1148,12 +1148,12 @@ function buildSummary() {
   if (garmentSubtotal > 0) html += `<div class="price-row"><span class="price-row-key">Garments Subtotal</span><span class="price-row-val">${formatINR(garmentSubtotal)}</span></div>`;
   if (accSubtotal > 0)     html += `<div class="price-row"><span class="price-row-key">Accessories Subtotal</span><span class="price-row-val">${formatINR(accSubtotal)}</span></div>`;
   html += `<div class="price-row subtotal-row"><span class="price-row-key">Subtotal (before tax)</span><span class="price-row-val">${formatINR(subtotal)}</span></div>`;
-  if (garmentSubtotal > 0) html += `<div class="price-row tax-row"><span class="price-row-key">GST on Garments (12%)</span><span class="price-row-val">${formatINR(garmentTax)}</span></div>`;
-  if (accSubtotal > 0)     html += `<div class="price-row tax-row"><span class="price-row-key">GST on Accessories (18%)</span><span class="price-row-val">${formatINR(accTax)}</span></div>`;
+  if (garmentSubtotal > 0) html += `<div class="price-row tax-row"><span class="price-row-key">GST on Garments (5%)</span><span class="price-row-val">${formatINR(garmentTax)}</span></div>`;
+  if (accSubtotal > 0)     html += `<div class="price-row tax-row"><span class="price-row-key">GST on Accessories (5%)</span><span class="price-row-val">${formatINR(accTax)}</span></div>`;
   if (totalTax > 0)        html += `<div class="price-row tax-row"><span class="price-row-key">Total GST</span><span class="price-row-val">${formatINR(totalTax)}</span></div>`;
   html += `<div class="price-row grand-total-row"><span class="price-row-key">GRAND TOTAL (incl. GST)</span><span class="price-row-val">${formatINR(grandTotal)}</span></div>`;
   html += `</div></div>`;
-  html += `<p class="tax-note" style="margin-bottom:12px;">* Prices are indicative estimates. Final invoice may vary based on fabric, customisation & freight. GST @ 12% on readymade garments and 18% on accessories.</p>`;
+  html += `<p class="tax-note" style="margin-bottom:12px;">* Prices are indicative estimates. Final invoice may vary based on fabric, customisation & freight. GST @ 5% on readymade garments and 5% on accessories.</p>`;
 
   el.innerHTML = html;
 }
