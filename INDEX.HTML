@@ -249,6 +249,88 @@
       .garment-right { grid-column: 1 / -1; }
       .steps .step-label { display: none; }
     }
+
+    /* ── AUTH STYLES ────────────────────────────────────────────────────── */
+    .auth-bar {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 12px;
+    }
+    .auth-bar .user-greeting { color: var(--muted); font-weight: 500; }
+    .auth-bar .user-greeting strong { color: var(--text); }
+    .btn-auth {
+      padding: 7px 16px; font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
+      text-transform: uppercase; border: 2px solid var(--text);
+      cursor: pointer; background: transparent; color: var(--text);
+      transition: all 0.2s;
+    }
+    .btn-auth:hover { background: var(--text); color: var(--bg); }
+    .btn-auth.btn-logout { border-color: var(--muted); color: var(--muted); }
+    .btn-auth.btn-logout:hover { background: var(--muted); color: white; border-color: var(--muted); }
+    .btn-auth.btn-orders { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-auth.btn-orders:hover { background: var(--red); border-color: var(--red); }
+
+    /* Modal overlay */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(26,24,20,0.55); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--white); border: 2px solid var(--text);
+      width: 100%; max-width: 420px; max-height: 90vh;
+      overflow-y: auto; margin: 16px;
+    }
+    .modal-head {
+      background: var(--text); color: var(--bg);
+      padding: 16px 24px; display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.06em; }
+    .modal-close { cursor: pointer; font-size: 22px; line-height: 1; color: var(--bg); background: none; border: none; }
+    .modal-body { padding: 24px; }
+    .modal-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 22px; }
+    .modal-tab {
+      flex: 1; padding: 10px; text-align: center;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.07em;
+      text-transform: uppercase; cursor: pointer; color: var(--muted);
+      border-bottom: 3px solid transparent; margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .modal-tab.active { color: var(--text); border-bottom-color: var(--text); }
+    .auth-form .field { margin-bottom: 16px; }
+    .auth-form label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
+    .auth-form input {
+      width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+      padding: 10px 12px; outline: none; transition: border-color 0.2s;
+    }
+    .auth-form input:focus { border-color: var(--text); }
+    .auth-msg { font-size: 12px; margin-top: 10px; min-height: 18px; }
+    .auth-msg.err { color: var(--red); }
+    .auth-msg.ok  { color: var(--success); }
+    .btn-auth-submit {
+      width: 100%; padding: 13px; background: var(--text); color: var(--bg);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase; border: none;
+      cursor: pointer; margin-top: 6px; transition: background 0.2s;
+    }
+    .btn-auth-submit:hover { background: var(--red); }
+
+    /* Order History modal */
+    .orders-modal .modal-box { max-width: 680px; }
+    .order-card { border: 1px solid var(--border); margin-bottom: 14px; }
+    .order-card-head {
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 10px 16px; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 8px;
+    }
+    .order-ref { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--text); }
+    .order-date { font-size: 11px; color: var(--muted); }
+    .order-total { font-size: 14px; font-weight: 700; color: var(--price-color); }
+    .order-card-body { padding: 12px 16px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+    .no-orders { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
   </style>
 </head>
 <body>
@@ -260,9 +342,56 @@
     <div class="brand">DIVINE<span>UNIFORM</span></div>
     <div class="page-sub">Garments & Accessories Requirement Form</div>
   </div>
-  <div style="font-size:12px;color:var(--muted);text-align:right;line-height:1.8;">
-    Serving: Indian Oil · HP · BP · Nayara<br/>
-    Fill all required fields marked <span style="color:var(--red)">*</span>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+    <div id="authBar" class="auth-bar"></div>
+    <div style="font-size:12px;color:var(--muted);text-align:right;line-height:1.8;">
+      Serving: Indian Oil · HP · BP · Nayara<br/>
+      Fill all required fields marked <span style="color:var(--red)">*</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── AUTH MODAL ────────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">My Account</div>
+      <button class="modal-close" onclick="closeModal('authModal')">&#x00D7;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <div class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Login</div>
+        <div class="modal-tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</div>
+      </div>
+      <div id="loginForm" class="auth-form">
+        <div class="field"><label>Mobile Number *</label><input type="tel" id="l_phone" placeholder="+91 98765 43210"/></div>
+        <div class="field"><label>Password *</label><input type="password" id="l_pass" placeholder="Your password"/></div>
+        <div class="auth-msg err" id="loginMsg"></div>
+        <button class="btn-auth-submit" onclick="doLogin()">Login &rarr;</button>
+      </div>
+      <div id="signupForm" class="auth-form" style="display:none;">
+        <div class="field"><label>Full Name *</label><input type="text" id="s_name" placeholder="Ramesh Kumar"/></div>
+        <div class="field"><label>Company / Organisation *</label><input type="text" id="s_org" placeholder="Petrol Station Name"/></div>
+        <div class="field"><label>Mobile Number *</label><input type="tel" id="s_phone" placeholder="+91 98765 43210"/></div>
+        <div class="field"><label>GST No.</label><input type="text" id="s_gst" placeholder="07BBKPB..."/></div>
+        <div class="field"><label>Email</label><input type="email" id="s_email" placeholder="you@example.com"/></div>
+        <div class="field"><label>Delivery Address *</label><input type="text" id="s_addr" placeholder="Street, City, State, PIN"/></div>
+        <div class="field"><label>Password *</label><input type="password" id="s_pass" placeholder="Create a password"/></div>
+        <div class="auth-msg err" id="signupMsg"></div>
+        <button class="btn-auth-submit" onclick="doSignup()">Create Account &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ORDER HISTORY MODAL ────────────────────────────────────────────────── -->
+<div class="modal-overlay orders-modal" id="ordersModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">My Orders</div>
+      <button class="modal-close" onclick="closeModal('ordersModal')">&#x00D7;</button>
+    </div>
+    <div class="modal-body" id="ordersBody"></div>
   </div>
 </div>
 
@@ -1052,8 +1181,173 @@ function submitForm() {
   document.querySelectorAll('.steps').forEach(s => s.style.display = 'none');
   document.getElementById('successScreen').classList.add('visible');
   document.getElementById('successRef').textContent = `Order ${ref} — WhatsApp opened!`;
+
+  // Save order to logged-in user
+  const session = getSession();
+  if (session) {
+    const users = getUsers();
+    const user = users[session.phone];
+    if (user) {
+      if (!user.orders) user.orders = [];
+      let garmentSummary = [];
+      state.companies.forEach(co => {
+        GARMENTS.forEach(g => {
+          const gd = state.garments[co]?.[g.id];
+          if (!gd?.enabled) return;
+          const s = Object.entries(gd.sizes).map(([sz,q]) => sz+'x'+q).join(', ');
+          if (s) garmentSummary.push(CO_META[co].name+' '+g.label+': '+s);
+        });
+      });
+      user.orders.unshift({ ref, date: new Date().toLocaleDateString('en-IN'), grandTotal, summary: garmentSummary.join(' | ') || 'No garments' });
+      users[session.phone] = user;
+      localStorage.setItem('du_users', JSON.stringify(users));
+    }
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// AUTH SYSTEM
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('du_users') || '{}'); } catch(e) { return {}; }
+}
+function getSession() {
+  try { return JSON.parse(localStorage.getItem('du_session') || 'null'); } catch(e) { return null; }
+}
+function setSession(phone, name) {
+  localStorage.setItem('du_session', JSON.stringify({ phone, name }));
+}
+function clearSession() {
+  localStorage.removeItem('du_session');
+}
+
+function renderAuthBar() {
+  const bar = document.getElementById('authBar');
+  const session = getSession();
+  if (session) {
+    bar.innerHTML =
+      '<div class="user-greeting">Hello, <strong>' + session.name.split(' ')[0] + '</strong></div>' +
+      '<button class="btn-auth btn-orders" onclick="openOrders()">My Orders</button>' +
+      '<button class="btn-auth btn-logout" onclick="doLogout()">Logout</button>';
+  } else {
+    bar.innerHTML = '<button class="btn-auth" onclick="openModal(\'authModal\')">Login / Sign Up</button>';
+  }
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function switchTab(tab) {
+  document.getElementById('loginForm').style.display  = tab === 'login'  ? '' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? '' : 'none';
+  document.getElementById('tabLogin').classList.toggle('active',  tab === 'login');
+  document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+  document.getElementById('loginMsg').textContent  = '';
+  document.getElementById('signupMsg').textContent = '';
+}
+
+function doLogin() {
+  const phone = document.getElementById('l_phone').value.trim();
+  const pass  = document.getElementById('l_pass').value;
+  const msg   = document.getElementById('loginMsg');
+  if (!phone || !pass) { msg.textContent = 'Please fill in all fields.'; return; }
+  const users = getUsers();
+  const user  = users[phone];
+  if (!user || user.password !== btoa(pass)) {
+    msg.textContent = 'Incorrect mobile number or password.'; return;
+  }
+  setSession(phone, user.name);
+  closeModal('authModal');
+  renderAuthBar();
+  prefillCustomerDetails(user);
+  showAuthNotice('Welcome back, ' + user.name.split(' ')[0] + '! Your details have been filled in.');
+}
+
+function doSignup() {
+  const name  = document.getElementById('s_name').value.trim();
+  const org   = document.getElementById('s_org').value.trim();
+  const phone = document.getElementById('s_phone').value.trim();
+  const gst   = document.getElementById('s_gst').value.trim();
+  const email = document.getElementById('s_email').value.trim();
+  const addr  = document.getElementById('s_addr').value.trim();
+  const pass  = document.getElementById('s_pass').value;
+  const msg   = document.getElementById('signupMsg');
+  if (!name || !org || !phone || !addr || !pass) {
+    msg.textContent = 'Please fill all required fields.'; return;
+  }
+  const users = getUsers();
+  if (users[phone]) { msg.textContent = 'Mobile already registered. Please login.'; return; }
+  users[phone] = { name, org, phone, gst, email, addr, password: btoa(pass), orders: [] };
+  localStorage.setItem('du_users', JSON.stringify(users));
+  setSession(phone, name);
+  closeModal('authModal');
+  renderAuthBar();
+  prefillCustomerDetails(users[phone]);
+  showAuthNotice('Account created! Your details have been filled in automatically.');
+}
+
+function doLogout() {
+  clearSession();
+  renderAuthBar();
+}
+
+function prefillCustomerDetails(user) {
+  const fields = { c_name: user.name, c_org: user.org, c_phone: user.phone, c_gst: user.gst, c_email: user.email, c_addr: user.addr };
+  Object.entries(fields).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el && val) el.value = val;
+  });
+}
+
+function showAuthNotice(text) {
+  let notice = document.getElementById('authNotice');
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = 'authNotice';
+    notice.style.cssText = 'background:var(--success);color:white;text-align:center;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:0.05em;position:fixed;top:0;left:0;right:0;z-index:9999;transition:opacity 0.5s;';
+    document.body.prepend(notice);
+  }
+  notice.textContent = text;
+  notice.style.opacity = '1';
+  notice.style.display = 'block';
+  setTimeout(() => { notice.style.opacity = '0'; setTimeout(() => { notice.style.display = 'none'; }, 500); }, 3500);
+}
+
+function openOrders() {
+  const session = getSession();
+  if (!session) return;
+  const users = getUsers();
+  const user  = users[session.phone];
+  const orders = (user && user.orders) || [];
+  const body = document.getElementById('ordersBody');
+  if (!orders.length) {
+    body.innerHTML = '<div class="no-orders"><div style="font-size:40px;margin-bottom:12px;">&#128230;</div><div style="font-weight:600;color:var(--text);margin-bottom:6px;">No orders yet</div><div>Your submitted orders will appear here.</div></div>';
+  } else {
+    body.innerHTML = orders.map(o =>
+      '<div class="order-card"><div class="order-card-head"><div><div class="order-ref">'+o.ref+'</div><div class="order-date">'+o.date+'</div></div><div class="order-total">'+formatINR(o.grandTotal)+'</div></div><div class="order-card-body">'+o.summary+'</div></div>'
+    ).join('');
+  }
+  openModal('ordersModal');
+}
+
+// Init
+(function init() {
+  renderAuthBar();
+  const session = getSession();
+  if (session) {
+    const users = getUsers();
+    const user  = users[session.phone];
+    if (user) prefillCustomerDetails(user);
+  }
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+  });
+})();
 </script>
 </body>
 </html>
