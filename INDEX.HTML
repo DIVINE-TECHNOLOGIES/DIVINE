@@ -1,13 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DIVNE UNIFORM</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
-  <!-- Fixed favicon path -->
   <link rel="icon" type="image/x-icon" href="image/favicon.ico">
-</head>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -24,6 +22,7 @@
       --tag-text: #f5f3ef;
       --accent: #c0392b;
       --success: #2d6a4f;
+      --price-color: #1a6b3c;
     }
 
     body {
@@ -31,7 +30,7 @@
       font-family: 'DM Sans', sans-serif;
       color: var(--text);
       min-height: 100vh;
-      padding: 40px 20px 60px;
+      padding: 0 0 60px;
     }
 
     .top-banner {
@@ -50,7 +49,7 @@
     .brand span { color: var(--red); }
     .page-sub { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
 
-    .form-wrap { max-width: 860px; margin: 0 auto; }
+    .form-wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
 
     .steps { display: flex; margin-bottom: 32px; background: var(--white); border: 1px solid var(--border); }
     .step { flex: 1; padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-right: 1px solid var(--border); opacity: 0.4; transition: opacity 0.3s; }
@@ -105,20 +104,56 @@
     .uh-name { font-weight: 600; font-size: 14px; }
     .uniform-body { padding: 16px 18px; }
 
-    .garment-row { display: grid; grid-template-columns: 28px 200px 1fr auto; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    /* Garment row */
+    .garment-row {
+      display: grid;
+      grid-template-columns: 28px 180px 1fr;
+      align-items: start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
     .garment-row:last-child { border-bottom: none; }
-    .garment-check { width: 18px; height: 18px; accent-color: var(--text); cursor: pointer; }
+    .garment-check { width: 18px; height: 18px; accent-color: var(--text); cursor: pointer; margin-top: 3px; }
+    .garment-label-wrap { display: flex; flex-direction: column; gap: 3px; }
     .garment-label { font-size: 13px; font-weight: 500; }
+    .garment-unit-price { font-size: 11px; color: var(--price-color); font-weight: 600; }
+    .garment-right { display: flex; flex-direction: column; gap: 10px; }
 
     .size-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
     .size-tab { padding: 4px 10px; font-size: 11px; font-weight: 600; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; user-select: none; }
     .size-tab.sel { background: var(--text); color: var(--bg); border-color: var(--text); }
 
+    .qty-per-size-area { display: flex; flex-wrap: wrap; gap: 10px; min-height: 28px; }
+
+    /* ── Shared qty controls (used by garments, accessories, and shoes) ── */
     .qty-wrap { display: flex; align-items: center; }
-    .qty-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); background: var(--bg); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 600; user-select: none; }
+    .qty-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); background: var(--bg); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 600; user-select: none; line-height: 1; }
     .qty-btn:hover { background: var(--border); }
-    .qty-num { width: 40px; height: 28px; border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); border-left: none; border-right: none; text-align: center; font-size: 13px; font-weight: 600; background: var(--white); display: flex; align-items: center; justify-content: center; }
-    .garment-row.disabled .garment-label, .garment-row.disabled .size-tabs, .garment-row.disabled .qty-wrap { opacity: 0.3; pointer-events: none; }
+    .qty-num-box { width: 40px; height: 28px; border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); text-align: center; font-size: 13px; font-weight: 600; background: var(--white); display: flex; align-items: center; justify-content: center; }
+    .qty-input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .qty-input:focus { outline: none; }
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    .size-qty-block { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .size-qty-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .size-qty-subtotal { font-size: 10px; font-weight: 600; color: var(--price-color); white-space: nowrap; }
+
+    .garment-row.disabled .garment-label,
+    .garment-row.disabled .garment-unit-price,
+    .garment-row.disabled .size-tabs,
+    .garment-row.disabled .qty-per-size-area { opacity: 0.3; pointer-events: none; }
 
     /* Accessories */
     .acc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -129,24 +164,23 @@
     .acc-card.selected .acc-card-header { background: var(--red-light); }
     .acc-icon { font-size: 22px; flex-shrink: 0; }
     .acc-name { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; flex: 1; }
+    .acc-unit-price { font-size: 11px; color: var(--price-color); font-weight: 600; }
     .acc-toggle-icon { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
     .acc-card.selected .acc-toggle-icon { transform: rotate(45deg); color: var(--red); }
 
     .acc-company-rows { display: none; border-top: 1px solid var(--border); background: var(--white); }
     .acc-card.selected .acc-company-rows { display: block; }
 
-    /* Standard row */
-    .acc-co-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
+    /* Standard accessory row */
+    .acc-co-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
     .acc-co-row:last-child { border-bottom: none; }
     .acc-co-info { display: flex; align-items: center; gap: 10px; }
     .acc-co-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .acc-co-name { font-size: 12px; font-weight: 600; }
-    .acc-qty-wrap { display: flex; align-items: center; }
-    .acc-qty-btn { width: 26px; height: 26px; border: 1px solid var(--border); background: var(--bg); font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 600; user-select: none; }
-    .acc-qty-btn:hover { background: var(--border); }
-    .acc-qty-num { width: 38px; height: 26px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); border-left: none; border-right: none; text-align: center; font-size: 12px; font-weight: 600; background: white; display: flex; align-items: center; justify-content: center; }
+    .acc-co-right { display: flex; align-items: center; gap: 10px; }
+    .acc-co-subtotal { font-size: 11px; font-weight: 600; color: var(--price-color); min-width: 80px; text-align: right; }
 
-    /* ── Shoe size rows ── */
+    /* Shoe rows */
     .shoe-co-row { padding: 14px 16px; border-bottom: 1px solid var(--border); }
     .shoe-co-row:last-child { border-bottom: none; }
     .shoe-co-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -156,19 +190,9 @@
     .shoe-size-tab { padding: 5px 11px; font-size: 11px; font-weight: 600; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; user-select: none; }
     .shoe-size-tab.sel { background: var(--text); color: var(--bg); border-color: var(--text); }
     .shoe-qty-area { display: flex; flex-wrap: wrap; gap: 10px; min-height: 28px; }
-    .shoe-size-qty { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .shoe-size-qty { display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .shoe-sz-tag { font-size: 10px; font-weight: 700; color: var(--muted); }
-    .shoe-qty-wrap { display: flex; align-items: center; }
-    .shoe-qty-btn { width: 26px; height: 26px; border: 1px solid var(--border); background: var(--bg); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 600; user-select: none; }
-    .shoe-qty-btn:hover { background: var(--border); }
-    .shoe-qty-num { width: 34px; height: 26px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); border-left: none; border-right: none; text-align: center; font-size: 12px; font-weight: 600; background: white; display: flex; align-items: center; justify-content: center; }
-
-    /* Pricing additions */
-    .qty-input { width: 36px; height: 100%; border: none; background: none; text-align: center; font-size: 13px; font-weight: 600; color: var(--text); }
-    .qty-input:focus { outline: none; background: rgba(255,255,255,0.8); }
-    .price-tag { font-size: 11px; color: var(--success); font-weight: 600; white-space: nowrap; }
-    .total-row { font-weight: 700 !important; font-size: 14px !important; border-top: 2px solid var(--text) !important; padding-top: 8px !important; margin-top: 8px !important; }
-    .grand-total { background: var(--text) !important; color: var(--bg) !important; font-size: 16px !important; font-weight: 700 !important; }
+    .shoe-size-subtotal { font-size: 10px; font-weight: 600; color: var(--price-color); white-space: nowrap; }
 
     /* Nav */
     .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
@@ -182,12 +206,29 @@
 
     /* Summary */
     .summary-block { border: 1px solid var(--border); margin-bottom: 16px; }
-    .summary-head { background: var(--bg); border-bottom: 1px solid var(--border); padding: 10px 18px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+    .summary-head { background: var(--bg); border-bottom: 1px solid var(--border); padding: 10px 18px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px; }
     .summary-body { padding: 16px 18px; }
     .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; gap: 12px; }
     .summary-row:last-child { border-bottom: none; }
     .summary-key { color: var(--muted); flex-shrink: 0; }
     .summary-val { font-weight: 500; text-align: right; }
+
+    /* Pricing summary */
+    .price-summary-block { border: 2px solid var(--text); margin-bottom: 16px; }
+    .price-summary-head { background: var(--text); color: var(--bg); padding: 12px 18px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px; }
+    .price-summary-body { padding: 16px 18px; }
+    .price-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 13px; gap: 12px; }
+    .price-row:last-child { border-bottom: none; }
+    .price-row-key { color: var(--muted); }
+    .price-row-val { font-weight: 600; color: var(--text); }
+    .price-row.subtotal-row { border-top: 1.5px solid var(--border-dark); border-bottom: 1.5px solid var(--border-dark); padding: 8px 0; margin: 4px 0; font-weight: 700; }
+    .price-row.subtotal-row .price-row-key { color: var(--text); font-weight: 700; }
+    .price-row.tax-row .price-row-key { color: var(--muted); }
+    .price-row.grand-total-row { background: var(--text); color: var(--bg); margin: 8px -18px -16px; padding: 14px 18px; font-size: 16px; font-weight: 700; }
+    .price-row.grand-total-row .price-row-key { color: var(--bg); }
+    .price-row.grand-total-row .price-row-val { color: var(--bg); font-size: 18px; }
+
+    .tax-note { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
     /* Success */
     .success-screen { display: none; text-align: center; padding: 60px 40px; background: var(--white); border: 1px solid var(--border); }
@@ -204,8 +245,8 @@
       .field-grid { grid-template-columns: 1fr; }
       .company-grid { grid-template-columns: 1fr; }
       .acc-grid { grid-template-columns: 1fr; }
-      .garment-row { grid-template-columns: 28px 1fr; grid-template-rows: auto auto auto; }
-      .garment-row .size-tabs, .garment-row .qty-wrap { grid-column: 1 / -1; }
+      .garment-row { grid-template-columns: 28px 1fr; }
+      .garment-right { grid-column: 1 / -1; }
       .steps .step-label { display: none; }
     }
   </style>
@@ -315,7 +356,7 @@
   <div class="section" id="sec3">
     <div class="section-head"><div class="section-icon">🎒</div><div class="section-title">Accessories</div></div>
     <div class="section-body">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Select accessories and set quantities per company. For Shoes, select size (UK) and quantity per size per company. All fields are optional.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Select accessories and set quantities per company. For Shoes, select size (UK) and quantity per size. All fields are optional.</p>
       <div class="acc-grid" id="accGrid"></div>
       <div class="nav-row" style="margin-top:28px;">
         <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
@@ -348,62 +389,23 @@
 </div>
 
 <script>
-// ── Constants ─────────────────────────────────────
-// PRICES (₹ per unit)
+// ── Constants ─────────────────────────────────────────────────────────────────
+
 const PRICES = {
-  // Garments (flat per type)
-  half_tee: 350,
-  full_tee: 400,
-  shirt: 650,
-  pants: 550,
-  // Accessories
-  id_card: 80,
-  cap: 120,
-  whistle: 50,
-  shoes: 1200,
-  belt: 200,
-  id_holder: 60
+  half_tee:  350,
+  full_tee:  400,
+  shirt:     650,
+  pants:     550,
+  id_card:    80,
+  cap:       120,
+  whistle:    50,
+  shoes:    1200,
+  belt:      200,
+  id_holder:  60
 };
 
-// Helper functions
-function formatINR(n) {
-  return '₹' + n.toLocaleString('en-IN');
-}
-
-function calcGarmentSubtotal(co) {
-  let total = 0;
-  if (!state.garments[co]) return total;
-  Object.entries(state.garments[co]).forEach(([gid, gd]) => {
-    if (!gd.enabled) return;
-    Object.entries(gd.sizes).forEach(([sz, qty]) => {
-      total += qty * PRICES[gid];
-    });
-  });
-  return total;
-}
-
-function calcAccessorySubtotal(accId) {
-  let total = 0;
-  const accData = state.accessories[accId];
-  if (!accData) return total;
-  Object.entries(accData).forEach(([co, data]) => {
-    if (typeof data === 'number') {
-      total += data * PRICES[accId];
-    } else { // shoes: {sz: qty}
-      Object.values(data).forEach(qty => {
-        if (typeof qty === 'number') total += qty * PRICES[accId];
-      });
-    }
-  });
-  return total;
-}
-
-function getGrandTotal() {
-  let total = 0;
-  state.companies.forEach(co => total += calcGarmentSubtotal(co));
-  Object.keys(state.accessories || {}).forEach(id => total += calcAccessorySubtotal(id));
-  return total;
-}
+const GST_GARMENT   = 0.12;
+const GST_ACCESSORY = 0.18;
 
 const GARMENTS = [
   { id: 'half_tee', label: 'Half Sleeve T-Shirt' },
@@ -434,12 +436,95 @@ const CO_META = {
   NAYARA: { name: 'Nayara Energy', color: '#8B1A1A' },
 };
 
-// State:
-//   accessories (normal): { id_card: { IOCL: 5, HP: 3 } }
-//   accessories (shoes):  { shoes:   { IOCL: { '7': 2, '8': 1 }, HP: { '9': 3 } } }
 const state = { customer: {}, companies: [], garments: {}, accessories: {} };
 
-// ── Garments ──────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function formatINR(n) {
+  return '₹' + Math.round(n).toLocaleString('en-IN');
+}
+
+// ── Shared qty control builder ────────────────────────────────────────────────
+// Returns { wrap, input, setSubtotal } using the unified qty-* classes
+function makeQtyControl({ value, min, onUpdate }) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qty-wrap';
+
+  const minus = document.createElement('div');
+  minus.className = 'qty-btn';
+  minus.textContent = '−';
+
+  const numBox = document.createElement('div');
+  numBox.className = 'qty-num-box';
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.className = 'qty-input';
+  input.min = min;
+  input.value = value;
+
+  const plus = document.createElement('div');
+  plus.className = 'qty-btn';
+  plus.textContent = '+';
+
+  input.addEventListener('input', () => {
+    let v = input.value;
+    if (v === '') return;
+    v = parseInt(v);
+    if (isNaN(v) || v < min) v = min;
+    input.value = v;
+    onUpdate(v);
+  });
+  input.addEventListener('blur', () => {
+    let v = parseInt(input.value);
+    if (isNaN(v) || v < min) v = min;
+    input.value = v;
+    onUpdate(v);
+  });
+  minus.addEventListener('click', (e) => {
+    e.stopPropagation();
+    let v = parseInt(input.value);
+    if (v > min) { v--; input.value = v; onUpdate(v); }
+  });
+  plus.addEventListener('click', (e) => {
+    e.stopPropagation();
+    let v = parseInt(input.value);
+    v++;
+    input.value = v;
+    onUpdate(v);
+  });
+
+  numBox.appendChild(input);
+  wrap.appendChild(minus);
+  wrap.appendChild(numBox);
+  wrap.appendChild(plus);
+
+  return { wrap, input };
+}
+
+function calcGarmentSubtotal(co) {
+  let total = 0;
+  if (!state.garments[co]) return total;
+  Object.entries(state.garments[co]).forEach(([gid, gd]) => {
+    if (!gd.enabled) return;
+    Object.entries(gd.sizes).forEach(([, qty]) => { total += qty * PRICES[gid]; });
+  });
+  return total;
+}
+
+function calcAccessorySubtotal() {
+  let total = 0;
+  Object.entries(state.accessories).forEach(([id, data]) => {
+    Object.entries(data).forEach(([, val]) => {
+      if (typeof val === 'number') { total += val * PRICES[id]; }
+      else { Object.values(val).forEach(qty => { if (typeof qty === 'number') total += qty * PRICES[id]; }); }
+    });
+  });
+  return total;
+}
+
+// ── Garment UI ────────────────────────────────────────────────────────────────
+
 function buildGarmentUI(co) {
   if (!state.garments[co]) {
     state.garments[co] = {};
@@ -447,6 +532,7 @@ function buildGarmentUI(co) {
   }
   const container = document.getElementById('garments_' + co);
   container.innerHTML = '';
+
   GARMENTS.forEach(g => {
     const gs = state.garments[co][g.id];
     const row = document.createElement('div');
@@ -454,35 +540,50 @@ function buildGarmentUI(co) {
     row.id = `row_${co}_${g.id}`;
 
     const cb = document.createElement('input');
-    cb.type = 'checkbox'; cb.className = 'garment-check'; cb.checked = gs.enabled;
+    cb.type = 'checkbox';
+    cb.className = 'garment-check';
+    cb.checked = gs.enabled;
     cb.addEventListener('change', () => toggleGarment(co, g.id, cb.checked));
     row.appendChild(cb);
 
+    const labelWrap = document.createElement('div');
+    labelWrap.className = 'garment-label-wrap';
     const lbl = document.createElement('div');
-    lbl.className = 'garment-label'; lbl.textContent = g.label;
-    row.appendChild(lbl);
+    lbl.className = 'garment-label';
+    lbl.textContent = g.label;
+    const unitPrice = document.createElement('div');
+    unitPrice.className = 'garment-unit-price';
+    unitPrice.textContent = formatINR(PRICES[g.id]) + ' / pc';
+    labelWrap.appendChild(lbl);
+    labelWrap.appendChild(unitPrice);
+    row.appendChild(labelWrap);
+
+    const rightDiv = document.createElement('div');
+    rightDiv.className = 'garment-right';
 
     const sizesDiv = document.createElement('div');
     sizesDiv.className = 'size-tabs';
     GARMENT_SIZES[g.id].forEach(sz => {
       const tab = document.createElement('div');
-      tab.className = 'size-tab' + (gs.sizes[sz] ? ' sel' : '');
+      tab.className = 'size-tab' + (gs.sizes[sz] !== undefined ? ' sel' : '');
       tab.textContent = sz;
       tab.addEventListener('click', () => {
         if (!gs.enabled) return;
-        if (gs.sizes[sz]) { delete gs.sizes[sz]; tab.classList.remove('sel'); }
+        if (gs.sizes[sz] !== undefined) { delete gs.sizes[sz]; tab.classList.remove('sel'); }
         else { gs.sizes[sz] = 1; tab.classList.add('sel'); }
         renderGarmentQty(co, g.id);
       });
       sizesDiv.appendChild(tab);
     });
-    row.appendChild(sizesDiv);
+    rightDiv.appendChild(sizesDiv);
 
     const qtyArea = document.createElement('div');
+    qtyArea.className = 'qty-per-size-area';
     qtyArea.id = `qtyarea_${co}_${g.id}`;
-    qtyArea.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;';
-    renderGarmentQtyInto(gs, qtyArea);
-    row.appendChild(qtyArea);
+    renderGarmentQtyInto(gs, g.id, qtyArea);
+    rightDiv.appendChild(qtyArea);
+
+    row.appendChild(rightDiv);
     container.appendChild(row);
   });
 }
@@ -490,56 +591,37 @@ function buildGarmentUI(co) {
 function renderGarmentQtyInto(gs, gid, area) {
   area.innerHTML = '';
   const sizes = Object.keys(gs.sizes);
-  if (!sizes.length) { area.innerHTML = '<span style="font-size:11px;color:var(--muted);">Select size →</span>'; return; }
+  if (!sizes.length) {
+    area.innerHTML = '<span style="font-size:11px;color:var(--muted);">← Pick a size above</span>';
+    return;
+  }
   const price = PRICES[gid];
+
   sizes.forEach(sz => {
-    const qty = gs.sizes[sz];
-    const subtotal = qty * price;
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;width:140px;';
+    const block = document.createElement('div');
+    block.className = 'size-qty-block';
+
     const szLbl = document.createElement('div');
-    szLbl.style.cssText = 'font-size:10px;font-weight:600;color:var(--muted);';
-    szLbl.textContent = sz;
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:2px;';
-    const qw = document.createElement('div'); qw.className = 'qty-wrap';
-    const minus = document.createElement('div'); minus.className = 'qty-btn'; minus.textContent = '−';
-    const input = document.createElement('input'); input.type = 'number'; input.className = 'qty-input'; input.min = 1; input.value = qty;
-    input.addEventListener('input', () => {
-      let v = parseInt(input.value) || 1;
-      if (v < 1) v = 1;
-      input.value = v;
-      gs.sizes[sz] = v;
-      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
-    });
-    const plus = document.createElement('div'); plus.className = 'qty-btn'; plus.textContent = '+';
-    minus.addEventListener('click', () => {
-      let v = parseInt(input.value);
-      if (v > 1) {
-        v--;
-        input.value = v;
+    szLbl.className = 'size-qty-label';
+    szLbl.textContent = 'Size ' + sz;
+
+    const subtotalEl = document.createElement('div');
+    subtotalEl.className = 'size-qty-subtotal';
+    subtotalEl.textContent = formatINR(gs.sizes[sz] * price);
+
+    const { wrap } = makeQtyControl({
+      value: gs.sizes[sz],
+      min: 1,
+      onUpdate: (v) => {
         gs.sizes[sz] = v;
-        priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+        subtotalEl.textContent = formatINR(v * price);
       }
     });
-    plus.addEventListener('click', () => {
-      let v = parseInt(input.value);
-      v++;
-      input.value = v;
-      gs.sizes[sz] = v;
-      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
-    });
-    qw.appendChild(minus);
-    qw.appendChild(input);
-    qw.appendChild(plus);
-    row.appendChild(qw);
-    const priceTag = document.createElement('div');
-    priceTag.className = 'price-tag';
-    priceTag.textContent = `×${price} = ${formatINR(subtotal)}`;
-    row.appendChild(priceTag);
-    wrap.appendChild(szLbl);
-    wrap.appendChild(row);
-    area.appendChild(wrap);
+
+    block.appendChild(szLbl);
+    block.appendChild(wrap);
+    block.appendChild(subtotalEl);
+    area.appendChild(block);
   });
 }
 
@@ -552,12 +634,15 @@ function renderGarmentQty(co, gid) {
 function toggleGarment(co, gid, enabled) {
   const gs = state.garments[co][gid];
   gs.enabled = enabled;
-  const row = document.getElementById(`row_${co}_${gid}`);
-  if (enabled) row.classList.remove('disabled');
-  else { row.classList.add('disabled'); gs.sizes = {}; buildGarmentUI(co); }
+  if (!enabled) { gs.sizes = {}; buildGarmentUI(co); }
+  else {
+    const row = document.getElementById(`row_${co}_${gid}`);
+    if (row) row.classList.remove('disabled');
+  }
 }
 
-// ── Company toggle ────────────────────────────────
+// ── Company toggle ────────────────────────────────────────────────────────────
+
 function toggleCompany(card) {
   const co = card.dataset.co;
   if (card.classList.contains('selected')) {
@@ -573,17 +658,15 @@ function toggleCompany(card) {
   document.getElementById('coErr').style.display = state.companies.length === 0 ? 'block' : 'none';
 }
 
-// ── Accessories ───────────────────────────────────
+// ── Accessories ───────────────────────────────────────────────────────────────
+
 function buildAccessories() {
   const grid = document.getElementById('accGrid');
   grid.innerHTML = '';
 
   ACCESSORIES.forEach(acc => {
     const accData = state.accessories[acc.id];
-    const isSelected = accData !== undefined &&
-      (acc.hasSize
-        ? Object.values(accData).some(v => Object.keys(v).length > 0)
-        : Object.keys(accData).length > 0);
+    const isSelected = accData !== undefined;
 
     const card = document.createElement('div');
     card.className = 'acc-card' + (isSelected ? ' selected' : '');
@@ -591,71 +674,115 @@ function buildAccessories() {
 
     const header = document.createElement('div');
     header.className = 'acc-card-header';
-    header.innerHTML = `<div class="acc-icon">${acc.icon}</div><div class="acc-name">${acc.name}</div><div class="acc-toggle-icon">+</div>`;
-    header.addEventListener('click', () => toggleAcc(acc.id, acc.hasSize, card));
+
+    const iconEl = document.createElement('div'); iconEl.className = 'acc-icon'; iconEl.textContent = acc.icon;
+    const nameWrap = document.createElement('div'); nameWrap.style.flex = '1';
+    const nameEl = document.createElement('div'); nameEl.className = 'acc-name'; nameEl.textContent = acc.name;
+    const priceEl = document.createElement('div'); priceEl.className = 'acc-unit-price'; priceEl.textContent = formatINR(PRICES[acc.id]) + ' / pc';
+    nameWrap.appendChild(nameEl);
+    nameWrap.appendChild(priceEl);
+    const toggleIcon = document.createElement('div'); toggleIcon.className = 'acc-toggle-icon'; toggleIcon.textContent = '+';
+
+    header.appendChild(iconEl);
+    header.appendChild(nameWrap);
+    header.appendChild(toggleIcon);
+    header.addEventListener('click', () => { toggleAcc(acc.id, acc.hasSize, card); buildAccessories(); });
     card.appendChild(header);
 
     const coRows = document.createElement('div');
     coRows.className = 'acc-company-rows';
 
-    state.companies.forEach(co => {
-      const meta = CO_META[co];
+    if (state.companies.length === 0) {
+      const notice = document.createElement('div');
+      notice.style.cssText = 'padding:12px 16px;font-size:12px;color:var(--muted);';
+      notice.textContent = 'Select a company in Step 2 first.';
+      coRows.appendChild(notice);
+    } else {
+      state.companies.forEach(co => {
+        const meta = CO_META[co];
 
-      if (acc.hasSize) {
-        // ── SHOES: size tabs + qty per size ──────────
-        const shoeData = (accData && accData[co]) || {};
-        const row = document.createElement('div');
-        row.className = 'shoe-co-row';
+        if (acc.hasSize) {
+          // ── SHOES ──
+          const shoeData = (accData && accData[co]) ? accData[co] : {};
+          const row = document.createElement('div');
+          row.className = 'shoe-co-row';
 
-        // Company header
-        const coHeader = document.createElement('div');
-        coHeader.className = 'shoe-co-header';
-        coHeader.innerHTML = `<div class="acc-co-dot" style="background:${meta.color};"></div><div class="shoe-co-label">${meta.name}</div>`;
-        row.appendChild(coHeader);
+          const coHeader = document.createElement('div');
+          coHeader.className = 'shoe-co-header';
+          coHeader.innerHTML = `<div class="acc-co-dot" style="background:${meta.color};"></div><div class="shoe-co-label">${meta.name}</div>`;
+          row.appendChild(coHeader);
 
-        // Size label
-        const szLabel = document.createElement('div');
-        szLabel.className = 'shoe-size-label';
-        szLabel.textContent = 'Select Sizes (UK)';
-        row.appendChild(szLabel);
+          const szLabel = document.createElement('div');
+          szLabel.className = 'shoe-size-label';
+          szLabel.textContent = 'Select Sizes (UK)';
+          row.appendChild(szLabel);
 
-        // Size tabs
-        const sizesRow = document.createElement('div');
-        sizesRow.className = 'shoe-sizes';
-        SHOE_SIZES.forEach(sz => {
-          const tab = document.createElement('div');
-          tab.className = 'shoe-size-tab' + (shoeData[sz] !== undefined ? ' sel' : '');
-          tab.textContent = 'UK ' + sz;
-          tab.addEventListener('click', e => {
-            e.stopPropagation();
-            if (!card.classList.contains('selected')) return;
-            const d = state.accessories[acc.id][co];
-            if (d[sz] !== undefined) { delete d[sz]; tab.classList.remove('sel'); }
-            else { d[sz] = 1; tab.classList.add('sel'); }
-            renderShoeQty(acc.id, co, qtyArea);
+          const sizesRow = document.createElement('div');
+          sizesRow.className = 'shoe-sizes';
+
+          const qtyArea = document.createElement('div');
+          qtyArea.className = 'shoe-qty-area';
+
+          SHOE_SIZES.forEach(sz => {
+            const tab = document.createElement('div');
+            tab.className = 'shoe-size-tab' + (shoeData[sz] !== undefined ? ' sel' : '');
+            tab.textContent = 'UK ' + sz;
+            tab.addEventListener('click', e => {
+              e.stopPropagation();
+              if (!card.classList.contains('selected')) return;
+              const d = state.accessories[acc.id][co];
+              if (d[sz] !== undefined) { delete d[sz]; tab.classList.remove('sel'); }
+              else { d[sz] = 1; tab.classList.add('sel'); }
+              renderShoeQty(acc.id, co, qtyArea);
+            });
+            sizesRow.appendChild(tab);
           });
-          sizesRow.appendChild(tab);
-        });
-        row.appendChild(sizesRow);
 
-        // Qty area
-        const qtyArea = document.createElement('div');
-        qtyArea.className = 'shoe-qty-area';
-        renderShoeQty(acc.id, co, qtyArea);
-        row.appendChild(qtyArea);
+          row.appendChild(sizesRow);
 
-        coRows.appendChild(row);
+          if (accData && accData[co]) renderShoeQty(acc.id, co, qtyArea);
+          else qtyArea.innerHTML = '<span style="font-size:11px;color:var(--muted);margin-top:2px;">← Pick a size above</span>';
+          row.appendChild(qtyArea);
 
-      } else {
-        // ── STANDARD: qty only ────────────────────────
-        const qty = (accData && accData[co] !== undefined) ? accData[co] : 0;
-        const row = document.createElement('div');
-        row.className = 'acc-co-row';
-    const price = PRICES[acc.id];
-    const subtotal = qty * price;
-        coRows.appendChild(row);
-      }
-    });
+          coRows.appendChild(row);
+
+        } else {
+          // ── STANDARD ACCESSORY ──
+          const qty = (accData && accData[co] !== undefined) ? accData[co] : 0;
+          const price = PRICES[acc.id];
+
+          const row = document.createElement('div');
+          row.className = 'acc-co-row';
+
+          const infoDiv = document.createElement('div');
+          infoDiv.className = 'acc-co-info';
+          infoDiv.innerHTML = `<div class="acc-co-dot" style="background:${meta.color};"></div><div class="acc-co-name">${meta.name}</div>`;
+
+          const rightDiv = document.createElement('div');
+          rightDiv.className = 'acc-co-right';
+
+          const subtotalEl = document.createElement('div');
+          subtotalEl.className = 'acc-co-subtotal';
+          subtotalEl.textContent = qty > 0 ? formatINR(qty * price) : '—';
+
+          const { wrap } = makeQtyControl({
+            value: qty,
+            min: 0,
+            onUpdate: (v) => {
+              if (!state.accessories[acc.id]) state.accessories[acc.id] = {};
+              state.accessories[acc.id][co] = v;
+              subtotalEl.textContent = v > 0 ? formatINR(v * price) : '—';
+            }
+          });
+
+          rightDiv.appendChild(wrap);
+          rightDiv.appendChild(subtotalEl);
+          row.appendChild(infoDiv);
+          row.appendChild(rightDiv);
+          coRows.appendChild(row);
+        }
+      });
+    }
 
     card.appendChild(coRows);
     grid.appendChild(card);
@@ -672,85 +799,54 @@ function renderShoeQty(accId, co, area) {
   }
   const price = PRICES[accId];
   selected.forEach(sz => {
-    const qty = data[sz];
-    const subtotal = qty * price;
-    const wrap = document.createElement('div'); wrap.className = 'shoe-size-qty';
-    const tag = document.createElement('div'); tag.className = 'shoe-sz-tag'; tag.textContent = 'UK ' + sz;
-    const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:2px;';
-    const qw = document.createElement('div'); qw.className = 'shoe-qty-wrap';
-    const minus = document.createElement('div'); minus.className = 'shoe-qty-btn'; minus.textContent = '−';
-    const input = document.createElement('input'); input.type = 'number'; input.className = 'qty-input'; input.min = 1; input.value = qty;
-    input.addEventListener('input', e => {
-      e.stopPropagation();
-      let v = parseInt(input.value) || 1;
-      if (v < 1) v = 1;
-      input.value = v;
-      state.accessories[accId][co][sz] = v;
-      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
-    });
-    const plus = document.createElement('div'); plus.className = 'shoe-qty-btn'; plus.textContent = '+';
-    minus.addEventListener('click', e => {
-      e.stopPropagation();
-      let v = parseInt(input.value);
-      if (v > 1) {
-        v--;
-        input.value = v;
+    const wrap = document.createElement('div');
+    wrap.className = 'shoe-size-qty';
+
+    const tag = document.createElement('div');
+    tag.className = 'shoe-sz-tag';
+    tag.textContent = 'UK ' + sz;
+
+    const subtotalEl = document.createElement('div');
+    subtotalEl.className = 'shoe-size-subtotal';
+    subtotalEl.textContent = formatINR(data[sz] * price);
+
+    const { wrap: qw } = makeQtyControl({
+      value: data[sz],
+      min: 1,
+      onUpdate: (v) => {
         state.accessories[accId][co][sz] = v;
-        priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
+        subtotalEl.textContent = formatINR(v * price);
       }
     });
-    plus.addEventListener('click', e => {
-      e.stopPropagation();
-      let v = parseInt(input.value);
-      v++;
-      input.value = v;
-      state.accessories[accId][co][sz] = v;
-      priceTag.textContent = `×${price} = ${formatINR(v * price)}`;
-    });
-    qw.appendChild(minus); qw.appendChild(input); qw.appendChild(plus);
-    row.appendChild(qw);
-    const priceTag = document.createElement('div'); priceTag.className = 'price-tag'; priceTag.textContent = `×${price} = ${formatINR(subtotal)}`;
-    row.appendChild(priceTag);
-    wrap.appendChild(tag); wrap.appendChild(row);
+
+    wrap.appendChild(tag);
+    wrap.appendChild(qw);
+    wrap.appendChild(subtotalEl);
     area.appendChild(wrap);
   });
 }
 
 function toggleAcc(id, hasSize, card) {
   if (card.classList.contains('selected')) {
-    card.classList.remove('selected');
     delete state.accessories[id];
   } else {
-    card.classList.add('selected');
     if (!state.accessories[id]) {
       state.accessories[id] = {};
-      state.companies.forEach(co => {
-        state.accessories[id][co] = hasSize ? {} : 0;
-      });
+      state.companies.forEach(co => { state.accessories[id][co] = hasSize ? {} : 0; });
     }
   }
 }
 
-function accQty(id, co, delta, e) {
-  e.stopPropagation();
-  if (!state.accessories[id]) state.accessories[id] = {};
-  let v = (state.accessories[id][co] !== undefined ? state.accessories[id][co] : 0) + delta;
-  if (v < 0) v = 0;
-  state.accessories[id][co] = v;
-  const el = document.getElementById(`accq_${id}_${co}`);
-  if (el) el.textContent = v;
-  // Trigger rebuild for price display
-  buildAccessories();
-}
+// ── Steps ─────────────────────────────────────────────────────────────────────
 
-// ── Steps ─────────────────────────────────────────
 let currentStep = 1;
 function goStep(n) {
   if (n > currentStep && !validate(currentStep)) return;
   for (let i = 1; i <= 4; i++) {
     const s = document.getElementById('step' + i);
-    s.classList.remove('active','done');
-    if (i < n) s.classList.add('done'); else if (i === n) s.classList.add('active');
+    s.classList.remove('active', 'done');
+    if (i < n) s.classList.add('done');
+    else if (i === n) s.classList.add('active');
   }
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec' + n).classList.add('active');
@@ -760,96 +856,168 @@ function goStep(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── Validation ────────────────────────────────────
+// ── Validation ────────────────────────────────────────────────────────────────
+
 function validate(step) {
   if (step === 1) {
     const name  = document.getElementById('c_name').value.trim();
     const org   = document.getElementById('c_org').value.trim();
     const phone = document.getElementById('c_phone').value.trim();
     const addr  = document.getElementById('c_addr').value.trim();
-    if (!name || !org || !phone || !addr) { alert('Please fill all required fields (Name, Company, Mobile, Address).'); return false; }
-    state.customer = { name, org, phone, addr,
+    if (!name || !org || !phone || !addr) {
+      alert('Please fill all required fields (Name, Company, Mobile, Address).');
+      return false;
+    }
+    state.customer = {
+      name, org, phone, addr,
+      gst:   document.getElementById('c_gst').value.trim(),
       email: document.getElementById('c_email').value.trim(),
       date:  document.getElementById('c_date').value.trim(),
-      po:    document.getElementById('c_po').value.trim() };
+      po:    document.getElementById('c_po').value.trim()
+    };
     return true;
   }
   if (step === 2) {
-    if (!state.companies.length) { document.getElementById('coErr').style.display = 'block'; return false; }
+    if (!state.companies.length) {
+      document.getElementById('coErr').style.display = 'block';
+      return false;
+    }
     return true;
   }
   return true;
 }
 
-// ── Summary ───────────────────────────────────────
+// ── Summary ───────────────────────────────────────────────────────────────────
+
 function buildSummary() {
   const el = document.getElementById('summaryContent');
   let html = '';
 
-  html += `<div class="summary-block"><div class="summary-head">Customer Details</div><div class="summary-body">
-    <div class="summary-row"><span class="summary-key">Name</span><span class="summary-val">${state.customer.name}</span></div>
-    <div class="summary-row"><span class="summary-key">Organisation</span><span class="summary-val">${state.customer.org}</span></div>
-    <div class="summary-row"><span class="summary-key">Mobile</span><span class="summary-val">${state.customer.phone}</span></div>
-    ${state.customer.email?`<div class="summary-row"><span class="summary-key">Email</span><span class="summary-val">${state.customer.email}</span></div>`:''}
-    <div class="summary-row"><span class="summary-key">Delivery Address</span><span class="summary-val">${state.customer.addr}</span></div>
-    ${state.customer.date?`<div class="summary-row"><span class="summary-key">Required By</span><span class="summary-val">${state.customer.date}</span></div>`:''}
-    ${state.customer.po?`<div class="summary-row"><span class="summary-key">PO / Reference</span><span class="summary-val">${state.customer.po}</span></div>`:''}
-  </div></div>`;
+  html += `<div class="summary-block">
+    <div class="summary-head">👤 Customer Details</div>
+    <div class="summary-body">
+      <div class="summary-row"><span class="summary-key">Name</span><span class="summary-val">${state.customer.name}</span></div>
+      <div class="summary-row"><span class="summary-key">Organisation</span><span class="summary-val">${state.customer.org}</span></div>
+      ${state.customer.gst ? `<div class="summary-row"><span class="summary-key">GST No.</span><span class="summary-val">${state.customer.gst}</span></div>` : ''}
+      <div class="summary-row"><span class="summary-key">Mobile</span><span class="summary-val">${state.customer.phone}</span></div>
+      ${state.customer.email ? `<div class="summary-row"><span class="summary-key">Email</span><span class="summary-val">${state.customer.email}</span></div>` : ''}
+      <div class="summary-row"><span class="summary-key">Delivery Address</span><span class="summary-val">${state.customer.addr}</span></div>
+      ${state.customer.date ? `<div class="summary-row"><span class="summary-key">Required By</span><span class="summary-val">${state.customer.date}</span></div>` : ''}
+      ${state.customer.po ? `<div class="summary-row"><span class="summary-key">PO / Reference</span><span class="summary-val">${state.customer.po}</span></div>` : ''}
+    </div>
+  </div>`;
 
+  let garmentSubtotal = 0;
   state.companies.forEach(co => {
-    const coName = { IOCL:'Indian Oil', HP:'HP', BP:'BP', NAYARA:'Nayara Energy' }[co];
+    const coName = CO_META[co].name;
     let rows = '';
     GARMENTS.forEach(g => {
       const gd = state.garments[co]?.[g.id];
       if (!gd?.enabled) return;
       const sizes = Object.entries(gd.sizes);
       if (!sizes.length) return;
-      rows += `<div class="summary-row"><span class="summary-key">${g.label}</span><span class="summary-val">${sizes.map(([s,q])=>`${s}×${q}`).join(', ')}</span></div>`;
+      const lineTotal = sizes.reduce((s, [, q]) => s + q * PRICES[g.id], 0);
+      garmentSubtotal += lineTotal;
+      const sizeStr = sizes.map(([s, q]) => `${s} × ${q}`).join(', ');
+      rows += `<div class="summary-row">
+        <span class="summary-key">${g.label} <span style="font-size:10px;">(${formatINR(PRICES[g.id])}/pc)</span></span>
+        <span class="summary-val">${sizeStr} = <strong>${formatINR(lineTotal)}</strong></span>
+      </div>`;
     });
-    if (!rows) rows = `<div class="summary-row" style="color:var(--muted);font-size:12px;">No garments selected.</div>`;
-    html += `<div class="summary-block"><div class="summary-head">${coName} — Uniforms</div><div class="summary-body">${rows}</div></div>`;
+    if (!rows) rows = `<div class="summary-row" style="color:var(--muted);font-size:12px;"><span class="summary-key">No garments selected</span><span></span></div>`;
+    html += `<div class="summary-block">
+      <div class="summary-head" style="border-left:4px solid ${CO_META[co].color};">${coName} — Uniforms</div>
+      <div class="summary-body">${rows}</div>
+    </div>`;
   });
 
   const accKeys = Object.keys(state.accessories);
+  let accSubtotal = 0;
   if (accKeys.length) {
     let accRows = '';
     accKeys.forEach(id => {
       const acc = ACCESSORIES.find(a => a.id === id);
+      let lineTotal = 0;
       let detail = '';
       if (acc.hasSize) {
-        const parts = Object.entries(state.accessories[id]).map(([co, sizes]) => {
-          const s = Object.entries(sizes).map(([sz,q]) => `UK${sz}×${q}`).join(', ');
-          return s ? `${CO_META[co].name}: ${s}` : null;
-        }).filter(Boolean).join(' | ');
-        detail = parts || '—';
+        const parts = [];
+        Object.entries(state.accessories[id]).forEach(([co, sizes]) => {
+          const s = Object.entries(sizes).map(([sz, q]) => { lineTotal += q * PRICES[id]; return `UK${sz}×${q}`; }).join(', ');
+          if (s) parts.push(`${CO_META[co].name}: ${s}`);
+        });
+        detail = parts.join(' | ') || '—';
       } else {
-        detail = Object.entries(state.accessories[id]).map(([co,q]) => `${CO_META[co].name}: ${q}`).join(' · ');
+        const parts = [];
+        Object.entries(state.accessories[id]).forEach(([co, q]) => {
+          if (q > 0) { lineTotal += q * PRICES[id]; parts.push(`${CO_META[co].name}: ${q}`); }
+        });
+        detail = parts.join(' · ') || '—';
       }
-      accRows += `<div class="summary-row"><span class="summary-key">${acc.icon} ${acc.name}</span><span class="summary-val">${detail}</span></div>`;
+      accSubtotal += lineTotal;
+      accRows += `<div class="summary-row">
+        <span class="summary-key">${acc.icon} ${acc.name} <span style="font-size:10px;">(${formatINR(PRICES[id])}/pc)</span></span>
+        <span class="summary-val">${detail}${lineTotal > 0 ? ` = <strong>${formatINR(lineTotal)}</strong>` : ''}</span>
+      </div>`;
     });
-    html += `<div class="summary-block"><div class="summary-head">Accessories</div><div class="summary-body">${accRows}</div></div>`;
+    html += `<div class="summary-block">
+      <div class="summary-head">🎒 Accessories</div>
+      <div class="summary-body">${accRows}</div>
+    </div>`;
   }
+
+  const subtotal = garmentSubtotal + accSubtotal;
+  const garmentTax = Math.round(garmentSubtotal * GST_GARMENT);
+  const accTax     = Math.round(accSubtotal * GST_ACCESSORY);
+  const totalTax   = garmentTax + accTax;
+  const grandTotal = subtotal + totalTax;
+
+  html += `<div class="price-summary-block">
+    <div class="price-summary-head">💰 Price Breakdown & Estimated Total</div>
+    <div class="price-summary-body">`;
+
+  if (garmentSubtotal > 0) html += `<div class="price-row"><span class="price-row-key">Garments Subtotal</span><span class="price-row-val">${formatINR(garmentSubtotal)}</span></div>`;
+  if (accSubtotal > 0)     html += `<div class="price-row"><span class="price-row-key">Accessories Subtotal</span><span class="price-row-val">${formatINR(accSubtotal)}</span></div>`;
+  html += `<div class="price-row subtotal-row"><span class="price-row-key">Subtotal (before tax)</span><span class="price-row-val">${formatINR(subtotal)}</span></div>`;
+  if (garmentSubtotal > 0) html += `<div class="price-row tax-row"><span class="price-row-key">GST on Garments (12%)</span><span class="price-row-val">${formatINR(garmentTax)}</span></div>`;
+  if (accSubtotal > 0)     html += `<div class="price-row tax-row"><span class="price-row-key">GST on Accessories (18%)</span><span class="price-row-val">${formatINR(accTax)}</span></div>`;
+  if (totalTax > 0)        html += `<div class="price-row tax-row"><span class="price-row-key">Total GST</span><span class="price-row-val">${formatINR(totalTax)}</span></div>`;
+  html += `<div class="price-row grand-total-row"><span class="price-row-key">GRAND TOTAL (incl. GST)</span><span class="price-row-val">${formatINR(grandTotal)}</span></div>`;
+  html += `</div></div>`;
+  html += `<p class="tax-note" style="margin-bottom:12px;">* Prices are indicative estimates. Final invoice may vary based on fabric, customisation & freight. GST @ 12% on readymade garments and 18% on accessories.</p>`;
 
   el.innerHTML = html;
 }
 
-// ── Submit ────────────────────────────────────────
+// ── Submit ────────────────────────────────────────────────────────────────────
+
 function submitForm() {
   const ref = 'ORD-' + Date.now().toString(36).toUpperCase();
+
+  let garmentSub = 0;
+  state.companies.forEach(co => { garmentSub += calcGarmentSubtotal(co); });
+  const accSub    = calcAccessorySubtotal();
+  const subtotal  = garmentSub + accSub;
+  const tax       = Math.round(garmentSub * GST_GARMENT) + Math.round(accSub * GST_ACCESSORY);
+  const grandTotal = subtotal + tax;
+
   let msg = `*DIVINE UNIFORM ORDER* (${ref})%0A%0A`;
-  msg += `*Customer:* ${state.customer.name}%0A*Org:* ${state.customer.org}%0A*Phone:* ${state.customer.phone}%0A*Address:* ${state.customer.addr}%0A`;
+  msg += `*Customer:* ${state.customer.name}%0A`;
+  msg += `*Org:* ${state.customer.org}%0A`;
+  if (state.customer.gst)   msg += `*GST:* ${state.customer.gst}%0A`;
+  msg += `*Phone:* ${state.customer.phone}%0A`;
+  msg += `*Address:* ${state.customer.addr}%0A`;
   if (state.customer.email) msg += `*Email:* ${state.customer.email}%0A`;
   if (state.customer.date)  msg += `*Required By:* ${state.customer.date}%0A`;
   if (state.customer.po)    msg += `*PO:* ${state.customer.po}%0A`;
   msg += `%0A`;
 
   state.companies.forEach(co => {
-    const coName = { IOCL:'Indian Oil', HP:'HP', BP:'BP', NAYARA:'Nayara Energy' }[co];
+    const coName = CO_META[co].name;
     let lines = '';
     GARMENTS.forEach(g => {
       const gd = state.garments[co]?.[g.id];
       if (!gd?.enabled) return;
-      const s = Object.entries(gd.sizes).map(([sz,q]) => `${sz}x${q}`).join(', ');
+      const s = Object.entries(gd.sizes).map(([sz, q]) => `${sz}×${q}`).join(', ');
       if (s) lines += `• ${g.label}: ${s}%0A`;
     });
     if (lines) msg += `*${coName} Garments:*%0A${lines}%0A`;
@@ -862,17 +1030,21 @@ function submitForm() {
       const acc = ACCESSORIES.find(a => a.id === id);
       if (acc.hasSize) {
         const parts = Object.entries(state.accessories[id]).map(([co, sizes]) => {
-          const s = Object.entries(sizes).map(([sz,q]) => `UK${sz}x${q}`).join(', ');
+          const s = Object.entries(sizes).map(([sz, q]) => `UK${sz}×${q}`).join(', ');
           return s ? `${CO_META[co].name}: ${s}` : null;
         }).filter(Boolean).join(' | ');
         if (parts) aLines += `• ${acc.name}: ${parts}%0A`;
       } else {
-        const qtys = Object.entries(state.accessories[id]).map(([co,q]) => `${CO_META[co].name}: ${q}`).join(', ');
-        aLines += `• ${acc.name}: ${qtys}%0A`;
+        const qtys = Object.entries(state.accessories[id])
+          .filter(([, q]) => q > 0)
+          .map(([co, q]) => `${CO_META[co].name}: ${q}`).join(', ');
+        if (qtys) aLines += `• ${acc.name}: ${qtys}%0A`;
       }
     });
     if (aLines) msg += `*Accessories:*%0A${aLines}%0A`;
   }
+
+  msg += `%0A*Estimated Total (incl. GST):* ${formatINR(grandTotal)}%0A`;
   msg += `%0A*End of Order ${ref}*`;
 
   window.open(`https://wa.me/919811417786?text=${msg}`);
