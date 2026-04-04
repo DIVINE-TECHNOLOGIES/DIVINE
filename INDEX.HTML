@@ -23,6 +23,9 @@
       --accent: #c0392b;
       --success: #2d6a4f;
       --price-color: #1a6b3c;
+      --discount-bg: #f0fff4;
+      --discount-border: #2d6a4f;
+      --discount-text: #2d6a4f;
     }
 
     body {
@@ -51,7 +54,61 @@
 
     .form-wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
 
-    .steps { display: flex; margin-bottom: 32px; background: var(--white); border: 1px solid var(--border); }
+    /* ── BULK DISCOUNT BANNER ─────────────────────────────────────────────── */
+    .discount-banner {
+      display: none;
+      background: var(--discount-bg);
+      border: 2px solid var(--discount-border);
+      border-radius: 0;
+      padding: 12px 20px;
+      margin-bottom: 18px;
+      align-items: center;
+      gap: 14px;
+      animation: slideDown 0.35s ease;
+    }
+    .discount-banner.visible { display: flex; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .discount-banner-icon { font-size: 22px; flex-shrink: 0; }
+    .discount-banner-text { flex: 1; }
+    .discount-banner-title {
+      font-size: 13px; font-weight: 700; color: var(--discount-text);
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .discount-banner-sub { font-size: 12px; color: var(--discount-text); opacity: 0.85; margin-top: 2px; }
+    .discount-badge-pill {
+      background: var(--discount-text); color: white;
+      font-size: 12px; font-weight: 700; padding: 5px 14px;
+      letter-spacing: 0.05em; flex-shrink: 0;
+    }
+
+    /* Progress bar toward discount */
+    .discount-progress-wrap {
+      display: none;
+      margin-bottom: 18px;
+      border: 1.5px solid var(--border);
+      padding: 12px 18px;
+      background: var(--white);
+    }
+    .discount-progress-wrap.visible { display: block; }
+    .discount-progress-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+      display: flex; justify-content: space-between;
+    }
+    .discount-progress-label span { color: var(--red); font-weight: 700; }
+    .discount-progress-bar {
+      height: 6px; background: var(--border); overflow: hidden;
+    }
+    .discount-progress-fill {
+      height: 100%; background: var(--text);
+      transition: width 0.4s ease, background 0.4s ease;
+    }
+    .discount-progress-fill.full { background: var(--discount-text); }
+
+    .steps { display: flex; margin-bottom: 16px; background: var(--white); border: 1px solid var(--border); }
     .step { flex: 1; padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-right: 1px solid var(--border); opacity: 0.4; transition: opacity 0.3s; }
     .step:last-child { border-right: none; }
     .step.active { opacity: 1; }
@@ -91,7 +148,7 @@
     .logo-hp   { background: #00026c; color: white; }
     .logo-bp   { background: #b0b90f; color: white; }
     .logo-nay  { background: #1e45f4; color: white; }
-    .company-name { font-weight: 600; font-size: 15px; }
+    .logo-jiobp { background: linear-gradient(135deg, #00AEEF, #009900); color: white; }
     .company-sub { font-size: 11px; opacity: 0.6; }
     .check-badge { position: absolute; top: 10px; right: 12px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg); color: var(--text); display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
     .company-card.selected .check-badge { display: flex; }
@@ -117,7 +174,21 @@
     .garment-check { width: 18px; height: 18px; accent-color: var(--text); cursor: pointer; margin-top: 3px; }
     .garment-label-wrap { display: flex; flex-direction: column; gap: 3px; }
     .garment-label { font-size: 13px; font-weight: 500; }
+
+    /* Price display with discount support */
+    .garment-price-wrap { display: flex; flex-direction: column; gap: 1px; }
     .garment-unit-price { font-size: 11px; color: var(--price-color); font-weight: 600; }
+    .garment-unit-price.has-discount { color: var(--muted); text-decoration: line-through; font-weight: 400; }
+    .garment-discounted-price { font-size: 11px; color: var(--discount-text); font-weight: 700; display: none; }
+    .garment-discounted-price.visible { display: block; }
+    .garment-discount-tag {
+      display: none; font-size: 9px; font-weight: 700;
+      background: var(--discount-text); color: white;
+      padding: 1px 5px; letter-spacing: 0.05em;
+      width: fit-content; margin-top: 2px;
+    }
+    .garment-discount-tag.visible { display: block; }
+
     .garment-right { display: flex; flex-direction: column; gap: 10px; }
 
     .size-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -126,32 +197,22 @@
 
     .qty-per-size-area { display: flex; flex-wrap: wrap; gap: 10px; min-height: 28px; }
 
-    /* ── Shared qty controls (used by garments, accessories, and shoes) ── */
+    /* Qty controls */
     .qty-wrap { display: flex; align-items: center; }
     .qty-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); background: var(--bg); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 600; user-select: none; line-height: 1; }
     .qty-btn:hover { background: var(--border); }
     .qty-num-box { width: 70px; height: 28px; border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); text-align: center; font-size: 13px; font-weight: 600; background: var(--white); display: flex; align-items: center; justify-content: center; }
-    .qty-input {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: white;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-    }
+    .qty-input { width: 100%; height: 100%; border: none; background: white; text-align: center; font-size: 13px; font-weight: 600; color: var(--text); font-family: 'DM Sans', sans-serif; }
     .qty-input:focus { outline: none; }
-    .qty-input::-webkit-outer-spin-button,
-    .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
     .size-qty-block { display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .size-qty-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
     .size-qty-subtotal { font-size: 10px; font-weight: 600; color: var(--price-color); white-space: nowrap; }
+    .size-qty-subtotal.discounted { color: var(--discount-text); }
 
     .garment-row.disabled .garment-label,
-    .garment-row.disabled .garment-unit-price,
+    .garment-row.disabled .garment-price-wrap,
     .garment-row.disabled .size-tabs,
     .garment-row.disabled .qty-per-size-area { opacity: 0.3; pointer-events: none; }
 
@@ -171,7 +232,6 @@
     .acc-company-rows { display: none; border-top: 1px solid var(--border); background: var(--white); }
     .acc-card.selected .acc-company-rows { display: block; }
 
-    /* Standard accessory row */
     .acc-co-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
     .acc-co-row:last-child { border-bottom: none; }
     .acc-co-info { display: flex; align-items: center; gap: 10px; }
@@ -180,7 +240,6 @@
     .acc-co-right { display: flex; align-items: center; gap: 10px; }
     .acc-co-subtotal { font-size: 11px; font-weight: 600; color: var(--price-color); min-width: 80px; text-align: right; }
 
-    /* Shoe rows */
     .shoe-co-row { padding: 14px 16px; border-bottom: 1px solid var(--border); }
     .shoe-co-row:last-child { border-bottom: none; }
     .shoe-co-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -228,6 +287,11 @@
     .price-row.grand-total-row .price-row-key { color: var(--bg); }
     .price-row.grand-total-row .price-row-val { color: var(--bg); font-size: 18px; }
 
+    /* Discount rows in summary */
+    .price-row.discount-row { background: var(--discount-bg); }
+    .price-row.discount-row .price-row-key { color: var(--discount-text); font-weight: 600; }
+    .price-row.discount-row .price-row-val { color: var(--discount-text); font-weight: 700; }
+
     .tax-note { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
     /* Success */
@@ -250,149 +314,74 @@
       .steps .step-label { display: none; }
     }
 
-    /* ── AUTH STYLES ────────────────────────────────────────────────────── */
-    .auth-bar {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 12px;
-    }
+    /* AUTH STYLES */
+    .auth-bar { display: flex; align-items: center; gap: 12px; font-size: 12px; }
     .auth-bar .user-greeting { color: var(--muted); font-weight: 500; }
     .auth-bar .user-greeting strong { color: var(--text); }
-    .btn-auth {
-      padding: 7px 16px; font-family: 'DM Sans', sans-serif;
-      font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
-      text-transform: uppercase; border: 2px solid var(--text);
-      cursor: pointer; background: transparent; color: var(--text);
-      transition: all 0.2s;
-    }
+    .btn-auth { padding: 7px 16px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; border: 2px solid var(--text); cursor: pointer; background: transparent; color: var(--text); transition: all 0.2s; }
     .btn-auth:hover { background: var(--text); color: var(--bg); }
     .btn-auth.btn-logout { border-color: var(--muted); color: var(--muted); }
     .btn-auth.btn-logout:hover { background: var(--muted); color: white; border-color: var(--muted); }
     .btn-auth.btn-orders { background: var(--text); color: var(--bg); border-color: var(--text); }
     .btn-auth.btn-orders:hover { background: var(--red); border-color: var(--red); }
 
-    /* Modal overlay */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(26,24,20,0.55); z-index: 1000;
-      align-items: center; justify-content: center;
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,24,20,0.55); z-index: 1000; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: var(--white); border: 2px solid var(--text);
-      width: 100%; max-width: 420px; max-height: 90vh;
-      overflow-y: auto; margin: 16px;
-    }
-    .modal-head {
-      background: var(--text); color: var(--bg);
-      padding: 16px 24px; display: flex; align-items: center;
-      justify-content: space-between;
-    }
+    .modal-box { background: var(--white); border: 2px solid var(--text); width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; margin: 16px; }
+    .modal-head { background: var(--text); color: var(--bg); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
     .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.06em; }
     .modal-close { cursor: pointer; font-size: 22px; line-height: 1; color: var(--bg); background: none; border: none; }
     .modal-body { padding: 24px; }
     .modal-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 22px; }
-    .modal-tab {
-      flex: 1; padding: 10px; text-align: center;
-      font-size: 12px; font-weight: 600; letter-spacing: 0.07em;
-      text-transform: uppercase; cursor: pointer; color: var(--muted);
-      border-bottom: 3px solid transparent; margin-bottom: -2px;
-      transition: all 0.2s;
-    }
+    .modal-tab { flex: 1; padding: 10px; text-align: center; font-size: 12px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
     .modal-tab.active { color: var(--text); border-bottom-color: var(--text); }
     .auth-form .field { margin-bottom: 16px; }
     .auth-form label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
-    .auth-form input {
-      width: 100%; background: var(--bg); border: 1.5px solid var(--border);
-      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
-      padding: 10px 12px; outline: none; transition: border-color 0.2s;
-    }
+    .auth-form input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 12px; outline: none; transition: border-color 0.2s; }
     .auth-form input:focus { border-color: var(--text); }
     .auth-msg { font-size: 12px; margin-top: 10px; min-height: 18px; }
     .auth-msg.err { color: var(--red); }
     .auth-msg.ok  { color: var(--success); }
-    .btn-auth-submit {
-      width: 100%; padding: 13px; background: var(--text); color: var(--bg);
-      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase; border: none;
-      cursor: pointer; margin-top: 6px; transition: background 0.2s;
-    }
+    .btn-auth-submit { width: 100%; padding: 13px; background: var(--text); color: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
     .btn-auth-submit:hover { background: var(--red); }
 
-    /* Order History modal */
     .orders-modal .modal-box { max-width: 680px; }
     .order-card { border: 1px solid var(--border); margin-bottom: 14px; }
-    .order-card-head {
-      background: var(--bg); border-bottom: 1px solid var(--border);
-      padding: 10px 16px; display: flex; justify-content: space-between;
-      align-items: center; flex-wrap: wrap; gap: 8px;
-    }
+    .order-card-head { background: var(--bg); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .order-ref { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--text); }
     .order-date { font-size: 11px; color: var(--muted); }
     .order-total { font-size: 14px; font-weight: 700; color: var(--price-color); }
     .order-card-body { padding: 12px 16px; font-size: 12px; color: var(--muted); line-height: 1.7; }
     .no-orders { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
 
-  /* Site Footer */
-  .site-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--white);
-    border-top: 2px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 40px;
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    height: 44px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
-    z-index: 999;
-  }
-  .site-footer > div:first-child {
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  .site-footer > div:last-child {
-    opacity: 0.8;
-    font-style: italic;
-  }
+    .site-footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 10px 40px; font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.05em; height: 44px; box-shadow: 0 -2px 8px rgba(0,0,0,0.05); z-index: 999; }
+    .site-footer > div:first-child { font-weight: 600; text-transform: uppercase; }
+    .site-footer > div:last-child { opacity: 0.8; font-style: italic; }
 
-  @media (max-width: 640px) {
-    .site-footer {
-      flex-direction: column;
-      gap: 2px;
-      padding: 10px 20px;
-      height: auto;
-      text-align: center;
-      font-size: 10px;
+    @media (max-width: 640px) {
+      .site-footer { flex-direction: column; gap: 2px; padding: 10px 20px; height: auto; text-align: center; font-size: 10px; }
     }
-  }
   </style>
-
 </head>
 <body>
 
-<div class="top-banner">Uniform & Accessories Order Form — 2026</div>
+<div class="top-banner">Uniform &amp; Accessories Order Form — 2026</div>
 
 <div class="page-header">
   <div>
     <div class="brand">DIVINE<span>UNIFORM</span></div>
-    <div class="page-sub">Garments & Accessories Requirement Form</div>
+    <div class="page-sub">Garments &amp; Accessories Requirement Form</div>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
     <div id="authBar" class="auth-bar"></div>
     <div style="font-size:12px;color:var(--muted);text-align:right;line-height:1.8;">
-      Serving: Indian Oil · HP · BP · Nayara<br/>
+      Serving: Indian Oil · HP · BP · JIO-BP · Nayara<br/>
       Fill all required fields marked <span style="color:var(--red)">*</span>
     </div>
   </div>
 </div>
 
-<!-- ── AUTH MODAL ────────────────────────────────────────────────────────── -->
+<!-- AUTH MODAL -->
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
     <div class="modal-head">
@@ -425,7 +414,7 @@
   </div>
 </div>
 
-<!-- ── ORDER HISTORY MODAL ────────────────────────────────────────────────── -->
+<!-- ORDER HISTORY MODAL -->
 <div class="modal-overlay orders-modal" id="ordersModal">
   <div class="modal-box">
     <div class="modal-head">
@@ -442,7 +431,7 @@
     <div class="step active" id="step1"><div class="step-num">1</div><div class="step-label">Customer Details</div></div>
     <div class="step" id="step2"><div class="step-num">2</div><div class="step-label">Uniform Selection</div></div>
     <div class="step" id="step3"><div class="step-num">3</div><div class="step-label">Accessories</div></div>
-    <div class="step" id="step4"><div class="step-num">4</div><div class="step-label">Review & Submit</div></div>
+    <div class="step" id="step4"><div class="step-num">4</div><div class="step-label">Review &amp; Submit</div></div>
   </div>
 
   <!-- STEP 1 -->
@@ -494,9 +483,36 @@
           <div><div class="company-name">Nayara Energy</div><div class="company-sub">Formerly Essar Oil</div></div>
           <div class="check-badge">✓</div>
         </div>
+        <div class="company-card" data-co="JIOBP" onclick="toggleCompany(this)">
+          <div class="company-logo logo-jiobp">JBP</div>
+          <div><div class="company-name">JIO-BP</div><div class="company-sub">Reliance-BP Mobility</div></div>
+          <div class="check-badge">✓</div>
+        </div>
       </div>
       <div class="error-hint" id="coErr">⚠ Please select at least one company.</div>
-      <div style="height:24px;"></div>
+      <div style="height:18px;"></div>
+
+      <!-- Discount progress (shown while < threshold) -->
+      <div class="discount-progress-wrap" id="discountProgress">
+        <div class="discount-progress-label">
+          <span id="discountProgressLabel">Order progress toward bulk discount</span>
+          <span id="discountProgressCount">0 / 20 units</span>
+        </div>
+        <div class="discount-progress-bar">
+          <div class="discount-progress-fill" id="discountProgressFill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Discount active banner -->
+      <div class="discount-banner" id="discountBanner">
+        <div class="discount-banner-icon">🏷️</div>
+        <div class="discount-banner-text">
+          <div class="discount-banner-title">Bulk Discount Applied!</div>
+          <div class="discount-banner-sub">You've ordered 20+ garments — 5% off all garment prices automatically.</div>
+        </div>
+        <div class="discount-badge-pill">−5% OFF</div>
+      </div>
+
       <div id="uniformBuilders">
         <div class="uniform-block" id="uni_IOCL">
           <div class="uniform-head" style="background:#fff5ee;border-bottom:2px solid #ff6600;"><div class="uh-dot" style="background:#ff6600;"></div><div class="uh-name">Indian Oil — Uniform Requirements</div></div>
@@ -513,6 +529,10 @@
         <div class="uniform-block" id="uni_NAYARA">
           <div class="uniform-head" style="background:#fff0f0;border-bottom:2px solid #8B1A1A;"><div class="uh-dot" style="background:#8B1A1A;"></div><div class="uh-name">Nayara Energy — Uniform Requirements</div></div>
           <div class="uniform-body" id="garments_NAYARA"></div>
+        </div>
+        <div class="uniform-block" id="uni_JIOBP">
+          <div class="uniform-head" style="background:#e6faff;border-bottom:2px solid #08a900;"><div class="uh-dot" style="background:#00aa1c;"></div><div class="uh-name">JIO-BP — Uniform Requirements</div></div>
+          <div class="uniform-body" id="garments_JIOBP"></div>
         </div>
       </div>
       <div class="nav-row">
@@ -537,7 +557,7 @@
 
   <!-- STEP 4 -->
   <div class="section" id="sec4">
-    <div class="section-head"><div class="section-icon">📋</div><div class="section-title">Review & Submit</div></div>
+    <div class="section-head"><div class="section-icon">📋</div><div class="section-title">Review &amp; Submit</div></div>
     <div class="section-body">
       <div id="summaryContent"></div>
       <div style="margin-top:20px;padding:14px 18px;background:var(--bg);border:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.7;">
@@ -559,7 +579,10 @@
 </div>
 
 <script>
-// ── Constants ─────────────────────────────────────────────────────────────────
+// ── Constants ──────────────────────────────────────────────────────────────────
+
+const BULK_THRESHOLD = 20;        // pieces
+const BULK_DISCOUNT  = 0.05;      // 5%
 
 const PRICES = {
   half_tee:  350,
@@ -603,6 +626,7 @@ const CO_META = {
   IOCL:   { name: 'Indian Oil',    color: '#ff6600' },
   HP:     { name: 'HP',            color: '#003087' },
   BP:     { name: 'BP',            color: '#009900' },
+  JIOBP:  { name: 'JIO-BP',        color: '#00AEEF' },
   NAYARA: { name: 'Nayara Energy', color: '#8B1A1A' },
 };
 
@@ -614,8 +638,85 @@ function formatINR(n) {
   return '₹' + Math.round(n).toLocaleString('en-IN');
 }
 
+// ── Bulk Discount Logic ───────────────────────────────────────────────────────
+
+/** Total garment pieces across ALL companies and ALL garment types */
+function getTotalGarmentQty() {
+  let total = 0;
+  Object.values(state.garments).forEach(coData => {
+    Object.values(coData).forEach(gd => {
+      if (!gd.enabled) return;
+      Object.values(gd.sizes).forEach(qty => { total += qty; });
+    });
+  });
+  return total;
+}
+
+function isBulkDiscountActive() {
+  return getTotalGarmentQty() > BULK_THRESHOLD;
+}
+
+/** Effective price for a garment, applying discount when applicable */
+function getEffectiveGarmentPrice(gid) {
+  const base = PRICES[gid];
+  return isBulkDiscountActive() ? base * (1 - BULK_DISCOUNT) : base;
+}
+
+/** Update the discount UI widgets (progress bar / banner) */
+function updateDiscountUI() {
+  const qty      = getTotalGarmentQty();
+  const active   = qty > BULK_THRESHOLD;
+  const pct      = Math.min((qty / BULK_THRESHOLD) * 100, 100);
+
+  const banner   = document.getElementById('discountBanner');
+  const progress = document.getElementById('discountProgress');
+  const fill     = document.getElementById('discountProgressFill');
+  const countEl  = document.getElementById('discountProgressCount');
+
+  if (active) {
+    banner.classList.add('visible');
+    progress.classList.remove('visible');
+  } else {
+    banner.classList.remove('visible');
+    // Only show progress bar if at least one garment is selected
+    if (qty > 0) {
+      progress.classList.add('visible');
+      fill.style.width = pct + '%';
+      fill.classList.remove('full');
+      countEl.textContent = qty + ' / ' + BULK_THRESHOLD + ' units';
+    } else {
+      progress.classList.remove('visible');
+    }
+  }
+
+  // Refresh all visible price labels in garment rows
+  document.querySelectorAll('[data-price-gid]').forEach(el => {
+    const gid = el.dataset.priceGid;
+    const ep  = getEffectiveGarmentPrice(gid);
+    el.querySelector('.garment-unit-price').classList.toggle('has-discount', active);
+    const discEl  = el.querySelector('.garment-discounted-price');
+    const tagEl   = el.querySelector('.garment-discount-tag');
+    if (discEl) { discEl.textContent = formatINR(ep) + ' / pc'; discEl.classList.toggle('visible', active); }
+    if (tagEl)  { tagEl.classList.toggle('visible', active); }
+  });
+
+  // Refresh all size subtotals currently visible
+  document.querySelectorAll('[data-subtotal-gid]').forEach(el => {
+    const gid = el.dataset.subtotalGid;
+    const sz  = el.dataset.subtotalSz;
+    const co  = el.dataset.subtotalCo;
+    const gd  = state.garments[co] && state.garments[co][gid];
+    if (!gd) return;
+    const qty2 = gd.sizes[sz];
+    if (qty2 === undefined) return;
+    const ep = getEffectiveGarmentPrice(gid);
+    el.textContent = formatINR(qty2 * ep);
+    el.classList.toggle('discounted', active);
+  });
+}
+
 // ── Shared qty control builder ────────────────────────────────────────────────
-// Returns { wrap, input, setSubtotal } using the unified qty-* classes
+
 function makeQtyControl({ value, min, onUpdate }) {
   const wrap = document.createElement('div');
   wrap.className = 'qty-wrap';
@@ -677,7 +778,8 @@ function calcGarmentSubtotal(co) {
   if (!state.garments[co]) return total;
   Object.entries(state.garments[co]).forEach(([gid, gd]) => {
     if (!gd.enabled) return;
-    Object.entries(gd.sizes).forEach(([, qty]) => { total += qty * PRICES[gid]; });
+    const ep = getEffectiveGarmentPrice(gid);
+    Object.entries(gd.sizes).forEach(([, qty]) => { total += qty * ep; });
   });
   return total;
 }
@@ -705,6 +807,9 @@ function buildGarmentUI(co) {
 
   GARMENTS.forEach(g => {
     const gs = state.garments[co][g.id];
+    const active = isBulkDiscountActive();
+    const ep = getEffectiveGarmentPrice(g.id);
+
     const row = document.createElement('div');
     row.className = 'garment-row' + (gs.enabled ? '' : ' disabled');
     row.id = `row_${co}_${g.id}`;
@@ -718,14 +823,34 @@ function buildGarmentUI(co) {
 
     const labelWrap = document.createElement('div');
     labelWrap.className = 'garment-label-wrap';
+
     const lbl = document.createElement('div');
     lbl.className = 'garment-label';
     lbl.textContent = g.label;
+
+    // Price display wrapper — marked with data attribute for live updates
+    const priceWrap = document.createElement('div');
+    priceWrap.className = 'garment-price-wrap';
+    priceWrap.dataset.priceGid = g.id;
+
     const unitPrice = document.createElement('div');
-    unitPrice.className = 'garment-unit-price';
+    unitPrice.className = 'garment-unit-price' + (active ? ' has-discount' : '');
     unitPrice.textContent = formatINR(PRICES[g.id]) + ' / pc';
+
+    const discountedPrice = document.createElement('div');
+    discountedPrice.className = 'garment-discounted-price' + (active ? ' visible' : '');
+    discountedPrice.textContent = formatINR(ep) + ' / pc';
+
+    const discountTag = document.createElement('div');
+    discountTag.className = 'garment-discount-tag' + (active ? ' visible' : '');
+    discountTag.textContent = '−5% BULK';
+
+    priceWrap.appendChild(unitPrice);
+    priceWrap.appendChild(discountedPrice);
+    priceWrap.appendChild(discountTag);
+
     labelWrap.appendChild(lbl);
-    labelWrap.appendChild(unitPrice);
+    labelWrap.appendChild(priceWrap);
     row.appendChild(labelWrap);
 
     const rightDiv = document.createElement('div');
@@ -742,6 +867,7 @@ function buildGarmentUI(co) {
         if (gs.sizes[sz] !== undefined) { delete gs.sizes[sz]; tab.classList.remove('sel'); }
         else { gs.sizes[sz] = 1; tab.classList.add('sel'); }
         renderGarmentQty(co, g.id);
+        updateDiscountUI();
       });
       sizesDiv.appendChild(tab);
     });
@@ -750,7 +876,7 @@ function buildGarmentUI(co) {
     const qtyArea = document.createElement('div');
     qtyArea.className = 'qty-per-size-area';
     qtyArea.id = `qtyarea_${co}_${g.id}`;
-    renderGarmentQtyInto(gs, g.id, qtyArea);
+    renderGarmentQtyInto(gs, g.id, co, qtyArea);
     rightDiv.appendChild(qtyArea);
 
     row.appendChild(rightDiv);
@@ -758,14 +884,15 @@ function buildGarmentUI(co) {
   });
 }
 
-function renderGarmentQtyInto(gs, gid, area) {
+function renderGarmentQtyInto(gs, gid, co, area) {
   area.innerHTML = '';
   const sizes = Object.keys(gs.sizes);
   if (!sizes.length) {
     area.innerHTML = '<span style="font-size:11px;color:var(--muted);">← Pick a size above</span>';
     return;
   }
-  const price = PRICES[gid];
+  const active = isBulkDiscountActive();
+  const ep = getEffectiveGarmentPrice(gid);
 
   sizes.forEach(sz => {
     const block = document.createElement('div');
@@ -776,15 +903,22 @@ function renderGarmentQtyInto(gs, gid, area) {
     szLbl.textContent = 'Size ' + sz;
 
     const subtotalEl = document.createElement('div');
-    subtotalEl.className = 'size-qty-subtotal';
-    subtotalEl.textContent = formatINR(gs.sizes[sz] * price);
+    subtotalEl.className = 'size-qty-subtotal' + (active ? ' discounted' : '');
+    subtotalEl.textContent = formatINR(gs.sizes[sz] * ep);
+    // Tag for live update
+    subtotalEl.dataset.subtotalGid = gid;
+    subtotalEl.dataset.subtotalSz  = sz;
+    subtotalEl.dataset.subtotalCo  = co;
 
     const { wrap } = makeQtyControl({
       value: gs.sizes[sz],
       min: 1,
       onUpdate: (v) => {
         gs.sizes[sz] = v;
-        subtotalEl.textContent = formatINR(v * price);
+        const curEp = getEffectiveGarmentPrice(gid);
+        subtotalEl.textContent = formatINR(v * curEp);
+        subtotalEl.classList.toggle('discounted', isBulkDiscountActive());
+        updateDiscountUI();
       }
     });
 
@@ -798,7 +932,7 @@ function renderGarmentQtyInto(gs, gid, area) {
 function renderGarmentQty(co, gid) {
   const gs = state.garments[co][gid];
   const area = document.getElementById(`qtyarea_${co}_${gid}`);
-  renderGarmentQtyInto(gs, gid, area);
+  renderGarmentQtyInto(gs, gid, co, area);
 }
 
 function toggleGarment(co, gid, enabled) {
@@ -809,6 +943,7 @@ function toggleGarment(co, gid, enabled) {
     const row = document.getElementById(`row_${co}_${gid}`);
     if (row) row.classList.remove('disabled');
   }
+  updateDiscountUI();
 }
 
 // ── Company toggle ────────────────────────────────────────────────────────────
@@ -826,6 +961,7 @@ function toggleCompany(card) {
     buildGarmentUI(co);
   }
   document.getElementById('coErr').style.display = state.companies.length === 0 ? 'block' : 'none';
+  updateDiscountUI();
 }
 
 // ── Accessories ───────────────────────────────────────────────────────────────
@@ -872,7 +1008,6 @@ function buildAccessories() {
         const meta = CO_META[co];
 
         if (acc.hasSize) {
-          // ── SHOES ──
           const shoeData = (accData && accData[co]) ? accData[co] : {};
           const row = document.createElement('div');
           row.className = 'shoe-co-row';
@@ -917,7 +1052,6 @@ function buildAccessories() {
           coRows.appendChild(row);
 
         } else {
-          // ── STANDARD ACCESSORY ──
           const qty = (accData && accData[co] !== undefined) ? accData[co] : 0;
           const price = PRICES[acc.id];
 
@@ -1061,6 +1195,8 @@ function validate(step) {
 
 function buildSummary() {
   const el = document.getElementById('summaryContent');
+  const discountActive = isBulkDiscountActive();
+  const totalQty = getTotalGarmentQty();
   let html = '';
 
   html += `<div class="summary-block">
@@ -1077,7 +1213,9 @@ function buildSummary() {
     </div>
   </div>`;
 
-  let garmentSubtotal = 0;
+  let garmentSubtotalBase = 0;  // before discount
+  let garmentSubtotalDisc = 0;  // after discount
+
   state.companies.forEach(co => {
     const coName = CO_META[co].name;
     let rows = '';
@@ -1086,12 +1224,18 @@ function buildSummary() {
       if (!gd?.enabled) return;
       const sizes = Object.entries(gd.sizes);
       if (!sizes.length) return;
-      const lineTotal = sizes.reduce((s, [, q]) => s + q * PRICES[g.id], 0);
-      garmentSubtotal += lineTotal;
+      const lineTotalBase = sizes.reduce((s, [, q]) => s + q * PRICES[g.id], 0);
+      const ep = getEffectiveGarmentPrice(g.id);
+      const lineTotalDisc = sizes.reduce((s, [, q]) => s + q * ep, 0);
+      garmentSubtotalBase += lineTotalBase;
+      garmentSubtotalDisc += lineTotalDisc;
       const sizeStr = sizes.map(([s, q]) => `${s} × ${q}`).join(', ');
+      const priceLabel = discountActive
+        ? `<span style="text-decoration:line-through;color:var(--muted);font-weight:400;">${formatINR(PRICES[g.id])}/pc</span> <span style="color:var(--discount-text);font-weight:700;">${formatINR(ep)}/pc</span>`
+        : `${formatINR(PRICES[g.id])}/pc`;
       rows += `<div class="summary-row">
-        <span class="summary-key">${g.label} <span style="font-size:10px;">(${formatINR(PRICES[g.id])}/pc)</span></span>
-        <span class="summary-val">${sizeStr} = <strong>${formatINR(lineTotal)}</strong></span>
+        <span class="summary-key">${g.label} <span style="font-size:10px;">(${priceLabel})</span></span>
+        <span class="summary-val">${sizeStr} = <strong>${formatINR(lineTotalDisc)}</strong></span>
       </div>`;
     });
     if (!rows) rows = `<div class="summary-row" style="color:var(--muted);font-size:12px;"><span class="summary-key">No garments selected</span><span></span></div>`;
@@ -1135,25 +1279,38 @@ function buildSummary() {
     </div>`;
   }
 
-  const subtotal = garmentSubtotal + accSubtotal;
-  const garmentTax = Math.round(garmentSubtotal * GST_GARMENT);
+  const discountAmount = discountActive ? (garmentSubtotalBase - garmentSubtotalDisc) : 0;
+  const subtotal = garmentSubtotalDisc + accSubtotal;
+  const garmentTax = Math.round(garmentSubtotalDisc * GST_GARMENT);
   const accTax     = Math.round(accSubtotal * GST_ACCESSORY);
   const totalTax   = garmentTax + accTax;
   const grandTotal = subtotal + totalTax;
 
   html += `<div class="price-summary-block">
-    <div class="price-summary-head">💰 Price Breakdown & Estimated Total</div>
+    <div class="price-summary-head">💰 Price Breakdown &amp; Estimated Total</div>
     <div class="price-summary-body">`;
 
-  if (garmentSubtotal > 0) html += `<div class="price-row"><span class="price-row-key">Garments Subtotal</span><span class="price-row-val">${formatINR(garmentSubtotal)}</span></div>`;
-  if (accSubtotal > 0)     html += `<div class="price-row"><span class="price-row-key">Accessories Subtotal</span><span class="price-row-val">${formatINR(accSubtotal)}</span></div>`;
+  if (garmentSubtotalBase > 0) {
+    html += `<div class="price-row"><span class="price-row-key">Garments (base price)</span><span class="price-row-val">${formatINR(garmentSubtotalBase)}</span></div>`;
+  }
+  if (discountActive && discountAmount > 0) {
+    html += `<div class="price-row discount-row"><span class="price-row-key">🏷️ Bulk Discount (5% on ${totalQty} garments)</span><span class="price-row-val">−${formatINR(discountAmount)}</span></div>`;
+    html += `<div class="price-row"><span class="price-row-key">Garments (after discount)</span><span class="price-row-val">${formatINR(garmentSubtotalDisc)}</span></div>`;
+  }
+  if (accSubtotal > 0) {
+    html += `<div class="price-row"><span class="price-row-key">Accessories Subtotal</span><span class="price-row-val">${formatINR(accSubtotal)}</span></div>`;
+  }
   html += `<div class="price-row subtotal-row"><span class="price-row-key">Subtotal (before tax)</span><span class="price-row-val">${formatINR(subtotal)}</span></div>`;
-  if (garmentSubtotal > 0) html += `<div class="price-row tax-row"><span class="price-row-key">GST on Garments (5%)</span><span class="price-row-val">${formatINR(garmentTax)}</span></div>`;
-  if (accSubtotal > 0)     html += `<div class="price-row tax-row"><span class="price-row-key">GST on Accessories (5%)</span><span class="price-row-val">${formatINR(accTax)}</span></div>`;
-  if (totalTax > 0)        html += `<div class="price-row tax-row"><span class="price-row-key">Total GST</span><span class="price-row-val">${formatINR(totalTax)}</span></div>`;
+  if (garmentSubtotalDisc > 0) html += `<div class="price-row tax-row"><span class="price-row-key">GST on Garments (12%)</span><span class="price-row-val">${formatINR(garmentTax)}</span></div>`;
+  if (accSubtotal > 0)         html += `<div class="price-row tax-row"><span class="price-row-key">GST on Accessories (18%)</span><span class="price-row-val">${formatINR(accTax)}</span></div>`;
+  if (totalTax > 0)            html += `<div class="price-row tax-row"><span class="price-row-key">Total GST</span><span class="price-row-val">${formatINR(totalTax)}</span></div>`;
   html += `<div class="price-row grand-total-row"><span class="price-row-key">GRAND TOTAL (incl. GST)</span><span class="price-row-val">${formatINR(grandTotal)}</span></div>`;
   html += `</div></div>`;
-  html += `<p class="tax-note" style="margin-bottom:12px;">* Prices are indicative estimates. Final invoice may vary based on fabric, customisation & freight. GST @ 5% on readymade garments and 5% on accessories.</p>`;
+
+  if (discountActive) {
+    html += `<p class="tax-note" style="margin-bottom:4px;color:var(--discount-text);font-weight:600;">✅ Bulk discount of 5% applied — you saved ${formatINR(discountAmount)} on garments!</p>`;
+  }
+  html += `<p class="tax-note" style="margin-bottom:12px;">* Prices are indicative estimates. Final invoice may vary based on fabric, customisation &amp; freight.</p>`;
 
   el.innerHTML = html;
 }
@@ -1162,13 +1319,27 @@ function buildSummary() {
 
 function submitForm() {
   const ref = 'ORD-' + Date.now().toString(36).toUpperCase();
+  const discountActive = isBulkDiscountActive();
 
-  let garmentSub = 0;
-  state.companies.forEach(co => { garmentSub += calcGarmentSubtotal(co); });
+  let garmentSubBase = 0;
+  let garmentSubDisc = 0;
+  state.companies.forEach(co => {
+    if (!state.garments[co]) return;
+    Object.entries(state.garments[co]).forEach(([gid, gd]) => {
+      if (!gd.enabled) return;
+      const ep = getEffectiveGarmentPrice(gid);
+      Object.entries(gd.sizes).forEach(([, qty]) => {
+        garmentSubBase += qty * PRICES[gid];
+        garmentSubDisc += qty * ep;
+      });
+    });
+  });
+
   const accSub    = calcAccessorySubtotal();
-  const subtotal  = garmentSub + accSub;
-  const tax       = Math.round(garmentSub * GST_GARMENT) + Math.round(accSub * GST_ACCESSORY);
+  const subtotal  = garmentSubDisc + accSub;
+  const tax       = Math.round(garmentSubDisc * GST_GARMENT) + Math.round(accSub * GST_ACCESSORY);
   const grandTotal = subtotal + tax;
+  const discountAmount = garmentSubBase - garmentSubDisc;
 
   let msg = `*DIVINE UNIFORM ORDER* (${ref})%0A%0A`;
   msg += `*Customer:* ${state.customer.name}%0A`;
@@ -1214,7 +1385,10 @@ function submitForm() {
     if (aLines) msg += `*Accessories:*%0A${aLines}%0A`;
   }
 
-  msg += `%0A*Estimated Total (incl. GST):* ${formatINR(grandTotal)}%0A`;
+  if (discountActive && discountAmount > 0) {
+    msg += `%0A*5%25 Bulk Discount Applied:* −₹${Math.round(discountAmount).toLocaleString('en-IN')}%0A`;
+  }
+  msg += `%0A*Estimated Total (incl. GST):* ₹${Math.round(grandTotal).toLocaleString('en-IN')}%0A`;
   msg += `%0A*End of Order ${ref}*`;
 
   window.open(`https://wa.me/919811417786?text=${msg}`);
@@ -1223,7 +1397,6 @@ function submitForm() {
   document.getElementById('successScreen').classList.add('visible');
   document.getElementById('successRef').textContent = `Order ${ref} — WhatsApp opened!`;
 
-  // Save order to logged-in user
   const session = getSession();
   if (session) {
     const users = getUsers();
@@ -1248,7 +1421,7 @@ function submitForm() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// AUTH SYSTEM
+// ── AUTH SYSTEM ───────────────────────────────────────────────────────────────
 
 function getUsers() {
   try { return JSON.parse(localStorage.getItem('du_users') || '{}'); } catch(e) { return {}; }
@@ -1276,12 +1449,8 @@ function renderAuthBar() {
   }
 }
 
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function switchTab(tab) {
   document.getElementById('loginForm').style.display  = tab === 'login'  ? '' : 'none';
@@ -1299,9 +1468,7 @@ function doLogin() {
   if (!phone || !pass) { msg.textContent = 'Please fill in all fields.'; return; }
   const users = getUsers();
   const user  = users[phone];
-  if (!user || user.password !== btoa(pass)) {
-    msg.textContent = 'Incorrect mobile number or password.'; return;
-  }
+  if (!user || user.password !== btoa(pass)) { msg.textContent = 'Incorrect mobile number or password.'; return; }
   setSession(phone, user.name);
   closeModal('authModal');
   renderAuthBar();
@@ -1318,9 +1485,7 @@ function doSignup() {
   const addr  = document.getElementById('s_addr').value.trim();
   const pass  = document.getElementById('s_pass').value;
   const msg   = document.getElementById('signupMsg');
-  if (!name || !org || !phone || !addr || !pass) {
-    msg.textContent = 'Please fill all required fields.'; return;
-  }
+  if (!name || !org || !phone || !addr || !pass) { msg.textContent = 'Please fill all required fields.'; return; }
   const users = getUsers();
   if (users[phone]) { msg.textContent = 'Mobile already registered. Please login.'; return; }
   users[phone] = { name, org, phone, gst, email, addr, password: btoa(pass), orders: [] };
@@ -1332,17 +1497,11 @@ function doSignup() {
   showAuthNotice('Account created! Your details have been filled in automatically.');
 }
 
-function doLogout() {
-  clearSession();
-  renderAuthBar();
-}
+function doLogout() { clearSession(); renderAuthBar(); }
 
 function prefillCustomerDetails(user) {
   const fields = { c_name: user.name, c_org: user.org, c_phone: user.phone, c_gst: user.gst, c_email: user.email, c_addr: user.addr };
-  Object.entries(fields).forEach(([id, val]) => {
-    const el = document.getElementById(id);
-    if (el && val) el.value = val;
-  });
+  Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el && val) el.value = val; });
 }
 
 function showAuthNotice(text) {
