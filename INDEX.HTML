@@ -23,6 +23,9 @@
       --accent: #c0392b;
       --success: #2d6a4f;
       --price-color: #1a6b3c;
+      --surcharge-bg: #fff8f0;
+      --surcharge-border: #c0392b;
+      --surcharge-text: #c0392b;
       --discount-bg: #f0fff4;
       --discount-border: #2d6a4f;
       --discount-text: #2d6a4f;
@@ -54,12 +57,24 @@
 
     .form-wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
 
-    /* ── BULK DISCOUNT BANNER ─────────────────────────────────────────────── */
+    /* ── Surcharge Banner (shown when qty < 20) ── */
+    .surcharge-banner {
+      display: none;
+      background: var(--surcharge-bg);
+      border: 2px solid var(--surcharge-border);
+      padding: 12px 20px;
+      margin-bottom: 18px;
+      align-items: center;
+      gap: 14px;
+      animation: slideDown 0.35s ease;
+    }
+    .surcharge-banner.visible { display: flex; }
+
+    /* ── MOQ Met Banner (shown when qty >= 20) ── */
     .discount-banner {
       display: none;
       background: var(--discount-bg);
       border: 2px solid var(--discount-border);
-      border-radius: 0;
       padding: 12px 20px;
       margin-bottom: 18px;
       align-items: center;
@@ -67,45 +82,29 @@
       animation: slideDown 0.35s ease;
     }
     .discount-banner.visible { display: flex; }
+
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .discount-banner-icon { font-size: 22px; flex-shrink: 0; }
     .discount-banner-text { flex: 1; }
-    .discount-banner-title {
-      font-size: 13px; font-weight: 700; color: var(--discount-text);
-      letter-spacing: 0.04em; text-transform: uppercase;
-    }
-    .discount-banner-sub { font-size: 12px; color: var(--discount-text); opacity: 0.85; margin-top: 2px; }
-    .discount-badge-pill {
-      background: var(--discount-text); color: white;
-      font-size: 12px; font-weight: 700; padding: 5px 14px;
-      letter-spacing: 0.05em; flex-shrink: 0;
-    }
+    .discount-banner-title { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .discount-banner-title.red { color: var(--surcharge-text); }
+    .discount-banner-title.green { color: var(--discount-text); }
+    .discount-banner-sub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+    .discount-banner-sub.red { color: var(--surcharge-text); }
+    .discount-banner-sub.green { color: var(--discount-text); }
+    .discount-badge-pill { font-size: 12px; font-weight: 700; padding: 5px 14px; letter-spacing: 0.05em; flex-shrink: 0; color: white; }
+    .pill-red { background: var(--surcharge-text); }
+    .pill-green { background: var(--discount-text); }
 
-    /* Progress bar toward discount */
-    .discount-progress-wrap {
-      display: none;
-      margin-bottom: 18px;
-      border: 1.5px solid var(--border);
-      padding: 12px 18px;
-      background: var(--white);
-    }
+    .discount-progress-wrap { display: none; margin-bottom: 18px; border: 1.5px solid var(--border); padding: 12px 18px; background: var(--white); }
     .discount-progress-wrap.visible { display: block; }
-    .discount-progress-label {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
-      display: flex; justify-content: space-between;
-    }
+    .discount-progress-label { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
     .discount-progress-label span { color: var(--red); font-weight: 700; }
-    .discount-progress-bar {
-      height: 6px; background: var(--border); overflow: hidden;
-    }
-    .discount-progress-fill {
-      height: 100%; background: var(--text);
-      transition: width 0.4s ease, background 0.4s ease;
-    }
+    .discount-progress-bar { height: 6px; background: var(--border); overflow: hidden; }
+    .discount-progress-fill { height: 100%; background: var(--red); transition: width 0.4s ease, background 0.4s ease; }
     .discount-progress-fill.full { background: var(--discount-text); }
 
     .steps { display: flex; margin-bottom: 16px; background: var(--white); border: 1px solid var(--border); }
@@ -138,7 +137,6 @@
     }
     input:focus, select:focus, textarea:focus { border-color: var(--text); }
 
-    /* Company cards */
     .company-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 10px; }
     .company-card { border: 2px solid var(--border); padding: 16px 18px; cursor: pointer; display: flex; align-items: center; gap: 14px; transition: all 0.2s; user-select: none; position: relative; }
     .company-card:hover { border-color: var(--text); }
@@ -153,7 +151,6 @@
     .check-badge { position: absolute; top: 10px; right: 12px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg); color: var(--text); display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
     .company-card.selected .check-badge { display: flex; }
 
-    /* Uniform builder */
     .uniform-block { border: 1px solid var(--border); margin-bottom: 20px; display: none; }
     .uniform-block.visible { display: block; }
     .uniform-head { padding: 10px 18px; display: flex; align-items: center; gap: 12px; }
@@ -161,33 +158,20 @@
     .uh-name { font-weight: 600; font-size: 14px; }
     .uniform-body { padding: 16px 18px; }
 
-    /* Garment row */
-    .garment-row {
-      display: grid;
-      grid-template-columns: 28px 180px 1fr;
-      align-items: start;
-      gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .garment-row { display: grid; grid-template-columns: 28px 180px 1fr; align-items: start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
     .garment-row:last-child { border-bottom: none; }
     .garment-check { width: 18px; height: 18px; accent-color: var(--text); cursor: pointer; margin-top: 3px; }
     .garment-label-wrap { display: flex; flex-direction: column; gap: 3px; }
     .garment-label { font-size: 13px; font-weight: 500; }
 
-    /* Price display with discount support */
     .garment-price-wrap { display: flex; flex-direction: column; gap: 1px; }
-    .garment-unit-price { font-size: 11px; color: var(--price-color); font-weight: 600; }
-    .garment-unit-price.has-discount { color: var(--muted); text-decoration: line-through; font-weight: 400; }
-    .garment-discounted-price { font-size: 11px; color: var(--discount-text); font-weight: 700; display: none; }
-    .garment-discounted-price.visible { display: block; }
-    .garment-discount-tag {
-      display: none; font-size: 9px; font-weight: 700;
-      background: var(--discount-text); color: white;
-      padding: 1px 5px; letter-spacing: 0.05em;
-      width: fit-content; margin-top: 2px;
-    }
-    .garment-discount-tag.visible { display: block; }
+    .garment-base-price { font-size: 11px; color: var(--price-color); font-weight: 600; }
+    .garment-surcharge-price { font-size: 11px; color: var(--surcharge-text); font-weight: 700; display: none; }
+    .garment-surcharge-price.visible { display: block; }
+    .garment-surcharge-tag { display: none; font-size: 9px; font-weight: 700; background: var(--surcharge-text); color: white; padding: 1px 5px; letter-spacing: 0.05em; width: fit-content; margin-top: 2px; }
+    .garment-surcharge-tag.visible { display: block; }
+    .garment-moq-label { font-size: 10px; color: var(--price-color); font-weight: 600; display: none; }
+    .garment-moq-label.visible { display: block; }
 
     .garment-right { display: flex; flex-direction: column; gap: 10px; }
 
@@ -197,7 +181,6 @@
 
     .qty-per-size-area { display: flex; flex-wrap: wrap; gap: 10px; min-height: 28px; }
 
-    /* Qty controls */
     .qty-wrap { display: flex; align-items: center; }
     .qty-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); background: var(--bg); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 600; user-select: none; line-height: 1; }
     .qty-btn:hover { background: var(--border); }
@@ -209,14 +192,13 @@
     .size-qty-block { display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .size-qty-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
     .size-qty-subtotal { font-size: 10px; font-weight: 600; color: var(--price-color); white-space: nowrap; }
-    .size-qty-subtotal.discounted { color: var(--discount-text); }
+    .size-qty-subtotal.surcharge { color: var(--surcharge-text); }
 
     .garment-row.disabled .garment-label,
     .garment-row.disabled .garment-price-wrap,
     .garment-row.disabled .size-tabs,
     .garment-row.disabled .qty-per-size-area { opacity: 0.3; pointer-events: none; }
 
-    /* Accessories */
     .acc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .acc-card { border: 1.5px solid var(--border); transition: all 0.2s; }
     .acc-card-header { padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; user-select: none; }
@@ -226,6 +208,7 @@
     .acc-icon { font-size: 22px; flex-shrink: 0; }
     .acc-name { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; flex: 1; }
     .acc-unit-price { font-size: 11px; color: var(--price-color); font-weight: 600; }
+    .acc-unit-price-note { font-size: 10px; color: var(--muted); }
     .acc-toggle-icon { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
     .acc-card.selected .acc-toggle-icon { transform: rotate(45deg); color: var(--red); }
 
@@ -253,7 +236,6 @@
     .shoe-sz-tag { font-size: 10px; font-weight: 700; color: var(--muted); }
     .shoe-size-subtotal { font-size: 10px; font-weight: 600; color: var(--price-color); white-space: nowrap; }
 
-    /* Nav */
     .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
     .btn { padding: 13px 32px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.2s; }
     .btn-outline { background: transparent; border: 2px solid var(--text); color: var(--text); }
@@ -263,7 +245,6 @@
     .btn-submit { background: var(--red); color: white; }
     .btn-submit:hover { background: #a93226; }
 
-    /* Summary */
     .summary-block { border: 1px solid var(--border); margin-bottom: 16px; }
     .summary-head { background: var(--bg); border-bottom: 1px solid var(--border); padding: 10px 18px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px; }
     .summary-body { padding: 16px 18px; }
@@ -272,7 +253,6 @@
     .summary-key { color: var(--muted); flex-shrink: 0; }
     .summary-val { font-weight: 500; text-align: right; }
 
-    /* Pricing summary */
     .price-summary-block { border: 2px solid var(--text); margin-bottom: 16px; }
     .price-summary-head { background: var(--text); color: var(--bg); padding: 12px 18px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px; }
     .price-summary-body { padding: 16px 18px; }
@@ -286,15 +266,12 @@
     .price-row.grand-total-row { background: var(--text); color: var(--bg); margin: 8px -18px -16px; padding: 14px 18px; font-size: 16px; font-weight: 700; }
     .price-row.grand-total-row .price-row-key { color: var(--bg); }
     .price-row.grand-total-row .price-row-val { color: var(--bg); font-size: 18px; }
-
-    /* Discount rows in summary */
-    .price-row.discount-row { background: var(--discount-bg); }
-    .price-row.discount-row .price-row-key { color: var(--discount-text); font-weight: 600; }
-    .price-row.discount-row .price-row-val { color: var(--discount-text); font-weight: 700; }
+    .price-row.surcharge-row { background: var(--surcharge-bg); }
+    .price-row.surcharge-row .price-row-key { color: var(--surcharge-text); font-weight: 600; }
+    .price-row.surcharge-row .price-row-val { color: var(--surcharge-text); font-weight: 700; }
 
     .tax-note { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
-    /* Success */
     .success-screen { display: none; text-align: center; padding: 60px 40px; background: var(--white); border: 1px solid var(--border); }
     .success-screen.visible { display: block; }
     .success-title { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--success); letter-spacing: 0.05em; }
@@ -314,7 +291,6 @@
       .steps .step-label { display: none; }
     }
 
-    /* AUTH STYLES */
     .auth-bar { display: flex; align-items: center; gap: 12px; font-size: 12px; }
     .auth-bar .user-greeting { color: var(--muted); font-weight: 500; }
     .auth-bar .user-greeting strong { color: var(--text); }
@@ -492,10 +468,10 @@
       <div class="error-hint" id="coErr">⚠ Please select at least one company.</div>
       <div style="height:18px;"></div>
 
-      <!-- Discount progress (shown while < threshold) -->
+      <!-- Progress bar shown while qty < 20 and qty > 0 -->
       <div class="discount-progress-wrap" id="discountProgress">
         <div class="discount-progress-label">
-          <span id="discountProgressLabel">Order progress toward bulk discount</span>
+          <span id="discountProgressLabel">Add more pieces to reach MOQ (20 pcs) for best price</span>
           <span id="discountProgressCount">0 / 20 units</span>
         </div>
         <div class="discount-progress-bar">
@@ -503,14 +479,24 @@
         </div>
       </div>
 
-      <!-- Discount active banner -->
-      <div class="discount-banner" id="discountBanner">
-        <div class="discount-banner-icon">🏷️</div>
+      <!-- Shown when qty < 20 -->
+      <div class="surcharge-banner" id="surchargeBanner">
+        <div class="discount-banner-icon">⚠️</div>
         <div class="discount-banner-text">
-          <div class="discount-banner-title">Bulk Discount Applied!</div>
-          <div class="discount-banner-sub">You've ordered 20+ garments — 5% off all garment prices automatically.</div>
+          <div class="discount-banner-title red">Small Quantity — 7% Surcharge Applied</div>
+          <div class="discount-banner-sub red">Orders below 20 pieces carry a +7% surcharge. Add more to unlock MOQ pricing.</div>
         </div>
-        <div class="discount-badge-pill">−5% OFF</div>
+        <div class="discount-badge-pill pill-red">+7%</div>
+      </div>
+
+      <!-- Shown when qty >= 20 -->
+      <div class="discount-banner" id="discountBanner">
+        <div class="discount-banner-icon">✅</div>
+        <div class="discount-banner-text">
+          <div class="discount-banner-title green">MOQ Reached — Best Price Unlocked!</div>
+          <div class="discount-banner-sub green">You've ordered 20+ garments — wholesale prices from the price list apply.</div>
+        </div>
+        <div class="discount-badge-pill pill-green">MOQ MET</div>
       </div>
 
       <div id="uniformBuilders">
@@ -581,37 +567,47 @@
 <script>
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const BULK_THRESHOLD = 20;        // pieces
-const BULK_DISCOUNT  = 0.05;      // 5%
+const MOQ_THRESHOLD    = 20;      // Minimum order qty for wholesale price
+const SMALL_QTY_SURCHARGE = 0.07; // +7% if total garments < 20
 
+// ── PRICES (Exclusive GST) — from official price list, valid for 20+ pcs ──
+// Below 20 pcs: these prices + 7% surcharge applied automatically
 const PRICES = {
-  half_tee:  350,
-  full_tee:  400,
-  shirt:     650,
-  pants:     550,
-  id_card:    80,
-  cap:       120,
-  whistle:    50,
-  shoes:    1200,
-  belt:      200,
-  id_holder:  60
+  // Garments (GST 5%)
+  half_tee:    190,   // H/S T-Shirt (Spun Matty with logo)
+  full_tee:    215,   // F/S T-Shirt (P.C Matty)
+  half_shirt:  265,   // H/S Shirt (Mill Made Cotton Mix 70x30)
+  full_shirt:  295,   // F/S Shirt (Mill Made Cotton Mix 70x30)
+  pants:       285,   // Trouser (P.V Trovine Fiber Dyed)
+  // Accessories (GST 5%)
+  id_card:      30,   // Laminated ID Card with digital print
+  cap:          35,   // Cap (avg: BP ₹32, IOC ₹33, HP ₹39)
+  whistle:      50,   // Whistle (not in price list — kept)
+  shoes:      1200,   // Shoes (not in price list — kept)
+  belt:         42,   // Belt (Nylon with Metal Buckle)
+  id_holder:    60,   // ID Card Holder (not in price list — kept)
 };
 
-const GST_GARMENT   = 0.12;
-const GST_ACCESSORY = 0.18;
+const GST_GARMENT   = 0.05;  // 5% GST on garments (per price list)
+const GST_ACCESSORY = 0.05;  // 5% GST on accessories (per price list)
 
+// ── GARMENTS ──────────────────────────────────────────────────────────────────
 const GARMENTS = [
-  { id: 'half_tee', label: 'Half Sleeve T-Shirt' },
-  { id: 'full_tee', label: 'Full Sleeve T-Shirt' },
-  { id: 'shirt',    label: 'Shirt' },
-  { id: 'pants',    label: 'Pants' },
+  { id: 'half_tee',   label: 'Half Sleeve T-Shirt',  fabric: 'Spun Matty with logo'             },
+  { id: 'full_tee',   label: 'Full Sleeve T-Shirt',   fabric: 'P.C Matty'                        },
+  { id: 'half_shirt', label: 'Half Sleeve Shirt',     fabric: 'Mill Made Cotton Mix 70×30'       },
+  { id: 'full_shirt', label: 'Full Sleeve Shirt',     fabric: 'Mill Made Cotton Mix 70×30'       },
+  { id: 'pants',      label: 'Trouser',               fabric: 'P.V Trovine Fiber Dyed'           },
 ];
+
 const GARMENT_SIZES = {
-  half_tee: ['S','M','L','XL','XXL'],
-  full_tee: ['S','M','L','XL','XXL'],
-  shirt:    ['38','40','42','44'],
-  pants:    ['28','30','32','34','36','38','40'],
+  half_tee:   ['S','M','L','XL','XXL'],
+  full_tee:   ['S','M','L','XL','XXL'],
+  half_shirt: ['38','40','42','44'],
+  full_shirt: ['38','40','42','44'],
+  pants:      ['28','30','32','34','36','38','40'],
 };
+
 const SHOE_SIZES = ['6','7','8','9','10','11'];
 
 const ACCESSORIES = [
@@ -622,6 +618,7 @@ const ACCESSORIES = [
   { id: 'belt',      icon: '🟤', name: 'Belt',           hasSize: false },
   { id: 'id_holder', icon: '📎', name: 'ID Card Holder', hasSize: false },
 ];
+
 const CO_META = {
   IOCL:   { name: 'Indian Oil',    color: '#ff6600' },
   HP:     { name: 'HP',            color: '#003087' },
@@ -632,15 +629,10 @@ const CO_META = {
 
 const state = { customer: {}, companies: [], garments: {}, accessories: {} };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function formatINR(n) {
   return '₹' + Math.round(n).toLocaleString('en-IN');
 }
 
-// ── Bulk Discount Logic ───────────────────────────────────────────────────────
-
-/** Total garment pieces across ALL companies and ALL garment types */
 function getTotalGarmentQty() {
   let total = 0;
   Object.values(state.garments).forEach(coData => {
@@ -652,144 +644,111 @@ function getTotalGarmentQty() {
   return total;
 }
 
-function isBulkDiscountActive() {
-  return getTotalGarmentQty() > BULK_THRESHOLD;
-}
+// Returns true if qty >= MOQ (no surcharge)
+function isMOQMet() { return getTotalGarmentQty() >= MOQ_THRESHOLD; }
 
-/** Effective price for a garment, applying discount when applicable */
+// Returns effective price per piece based on total qty
 function getEffectiveGarmentPrice(gid) {
   const base = PRICES[gid];
-  return isBulkDiscountActive() ? base * (1 - BULK_DISCOUNT) : base;
+  return isMOQMet() ? base : Math.round(base * (1 + SMALL_QTY_SURCHARGE) * 100) / 100;
 }
 
-/** Update the discount UI widgets (progress bar / banner) */
 function updateDiscountUI() {
-  const qty      = getTotalGarmentQty();
-  const active   = qty > BULK_THRESHOLD;
-  const pct      = Math.min((qty / BULK_THRESHOLD) * 100, 100);
+  const qty    = getTotalGarmentQty();
+  const moqMet = qty >= MOQ_THRESHOLD;
+  const pct    = Math.min((qty / MOQ_THRESHOLD) * 100, 100);
 
-  const banner   = document.getElementById('discountBanner');
-  const progress = document.getElementById('discountProgress');
-  const fill     = document.getElementById('discountProgressFill');
-  const countEl  = document.getElementById('discountProgressCount');
+  const surchargeBanner = document.getElementById('surchargeBanner');
+  const discountBanner  = document.getElementById('discountBanner');
+  const progress        = document.getElementById('discountProgress');
+  const fill            = document.getElementById('discountProgressFill');
+  const countEl         = document.getElementById('discountProgressCount');
 
-  if (active) {
-    banner.classList.add('visible');
+  if (moqMet) {
+    discountBanner.classList.add('visible');
+    surchargeBanner.classList.remove('visible');
     progress.classList.remove('visible');
+  } else if (qty > 0) {
+    surchargeBanner.classList.add('visible');
+    discountBanner.classList.remove('visible');
+    progress.classList.add('visible');
+    fill.style.width = pct + '%';
+    fill.classList.toggle('full', moqMet);
+    countEl.textContent = qty + ' / ' + MOQ_THRESHOLD + ' units';
   } else {
-    banner.classList.remove('visible');
-    // Only show progress bar if at least one garment is selected
-    if (qty > 0) {
-      progress.classList.add('visible');
-      fill.style.width = pct + '%';
-      fill.classList.remove('full');
-      countEl.textContent = qty + ' / ' + BULK_THRESHOLD + ' units';
-    } else {
-      progress.classList.remove('visible');
-    }
+    surchargeBanner.classList.remove('visible');
+    discountBanner.classList.remove('visible');
+    progress.classList.remove('visible');
   }
 
-  // Refresh all visible price labels in garment rows
+  // Update per-garment price display
   document.querySelectorAll('[data-price-gid]').forEach(el => {
     const gid = el.dataset.priceGid;
     const ep  = getEffectiveGarmentPrice(gid);
-    el.querySelector('.garment-unit-price').classList.toggle('has-discount', active);
-    const discEl  = el.querySelector('.garment-discounted-price');
-    const tagEl   = el.querySelector('.garment-discount-tag');
-    if (discEl) { discEl.textContent = formatINR(ep) + ' / pc'; discEl.classList.toggle('visible', active); }
-    if (tagEl)  { tagEl.classList.toggle('visible', active); }
+    const basePriceEl    = el.querySelector('.garment-base-price');
+    const surchargeEl    = el.querySelector('.garment-surcharge-price');
+    const surchargeTagEl = el.querySelector('.garment-surcharge-tag');
+    const moqLabelEl     = el.querySelector('.garment-moq-label');
+
+    if (!moqMet && qty > 0) {
+      // Surcharge active: show crossed base, show surcharge price
+      if (basePriceEl) { basePriceEl.style.textDecoration = 'line-through'; basePriceEl.style.color = 'var(--muted)'; }
+      if (surchargeEl) { surchargeEl.textContent = formatINR(ep) + ' / pc (+7%)'; surchargeEl.classList.add('visible'); }
+      if (surchargeTagEl) surchargeTagEl.classList.add('visible');
+      if (moqLabelEl) moqLabelEl.classList.remove('visible');
+    } else if (moqMet) {
+      // MOQ met: show base price clearly
+      if (basePriceEl) { basePriceEl.style.textDecoration = 'none'; basePriceEl.style.color = 'var(--price-color)'; }
+      if (surchargeEl) surchargeEl.classList.remove('visible');
+      if (surchargeTagEl) surchargeTagEl.classList.remove('visible');
+      if (moqLabelEl) moqLabelEl.classList.add('visible');
+    } else {
+      // qty = 0: reset to default
+      if (basePriceEl) { basePriceEl.style.textDecoration = 'none'; basePriceEl.style.color = 'var(--price-color)'; }
+      if (surchargeEl) surchargeEl.classList.remove('visible');
+      if (surchargeTagEl) surchargeTagEl.classList.remove('visible');
+      if (moqLabelEl) moqLabelEl.classList.remove('visible');
+    }
   });
 
-  // Refresh all size subtotals currently visible
+  // Update per-size subtotals
   document.querySelectorAll('[data-subtotal-gid]').forEach(el => {
     const gid = el.dataset.subtotalGid;
     const sz  = el.dataset.subtotalSz;
     const co  = el.dataset.subtotalCo;
     const gd  = state.garments[co] && state.garments[co][gid];
     if (!gd) return;
-    const qty2 = gd.sizes[sz];
-    if (qty2 === undefined) return;
-    const ep = getEffectiveGarmentPrice(gid);
-    el.textContent = formatINR(qty2 * ep);
-    el.classList.toggle('discounted', active);
+    const q = gd.sizes[sz];
+    if (q === undefined) return;
+    el.textContent = formatINR(q * getEffectiveGarmentPrice(gid));
+    el.classList.toggle('surcharge', !moqMet && qty > 0);
   });
 }
-
-// ── Shared qty control builder ────────────────────────────────────────────────
 
 function makeQtyControl({ value, min, onUpdate }) {
-  const wrap = document.createElement('div');
-  wrap.className = 'qty-wrap';
-
-  const minus = document.createElement('div');
-  minus.className = 'qty-btn';
-  minus.textContent = '−';
-
-  const numBox = document.createElement('div');
-  numBox.className = 'qty-num-box';
-
+  const wrap  = document.createElement('div'); wrap.className = 'qty-wrap';
+  const minus = document.createElement('div'); minus.className = 'qty-btn'; minus.textContent = '−';
+  const numBox = document.createElement('div'); numBox.className = 'qty-num-box';
   const input = document.createElement('input');
-  input.type = 'number';
-  input.className = 'qty-input';
-  input.min = min;
-  input.value = value;
+  input.type = 'number'; input.className = 'qty-input'; input.min = min; input.value = value;
+  const plus  = document.createElement('div'); plus.className = 'qty-btn'; plus.textContent = '+';
 
-  const plus = document.createElement('div');
-  plus.className = 'qty-btn';
-  plus.textContent = '+';
-
-  input.addEventListener('input', () => {
-    let v = input.value;
-    if (v === '') return;
-    v = parseInt(v);
-    if (isNaN(v) || v < min) v = min;
-    input.value = v;
-    onUpdate(v);
-  });
-  input.addEventListener('blur', () => {
-    let v = parseInt(input.value);
-    if (isNaN(v) || v < min) v = min;
-    input.value = v;
-    onUpdate(v);
-  });
-  minus.addEventListener('click', (e) => {
-    e.stopPropagation();
-    let v = parseInt(input.value);
-    if (v > min) { v--; input.value = v; onUpdate(v); }
-  });
-  plus.addEventListener('click', (e) => {
-    e.stopPropagation();
-    let v = parseInt(input.value);
-    v++;
-    input.value = v;
-    onUpdate(v);
-  });
+  input.addEventListener('input', () => { let v = parseInt(input.value); if (isNaN(v)||v<min) v=min; input.value=v; onUpdate(v); });
+  input.addEventListener('blur',  () => { let v = parseInt(input.value); if (isNaN(v)||v<min) v=min; input.value=v; onUpdate(v); });
+  minus.addEventListener('click', e => { e.stopPropagation(); let v=parseInt(input.value); if(v>min){v--;input.value=v;onUpdate(v);} });
+  plus.addEventListener('click',  e => { e.stopPropagation(); let v=parseInt(input.value)+1; input.value=v; onUpdate(v); });
 
   numBox.appendChild(input);
-  wrap.appendChild(minus);
-  wrap.appendChild(numBox);
-  wrap.appendChild(plus);
-
+  wrap.appendChild(minus); wrap.appendChild(numBox); wrap.appendChild(plus);
   return { wrap, input };
-}
-
-function calcGarmentSubtotal(co) {
-  let total = 0;
-  if (!state.garments[co]) return total;
-  Object.entries(state.garments[co]).forEach(([gid, gd]) => {
-    if (!gd.enabled) return;
-    const ep = getEffectiveGarmentPrice(gid);
-    Object.entries(gd.sizes).forEach(([, qty]) => { total += qty * ep; });
-  });
-  return total;
 }
 
 function calcAccessorySubtotal() {
   let total = 0;
   Object.entries(state.accessories).forEach(([id, data]) => {
     Object.entries(data).forEach(([, val]) => {
-      if (typeof val === 'number') { total += val * PRICES[id]; }
-      else { Object.values(val).forEach(qty => { if (typeof qty === 'number') total += qty * PRICES[id]; }); }
+      if (typeof val === 'number') total += val * PRICES[id];
+      else Object.values(val).forEach(qty => { if (typeof qty === 'number') total += qty * PRICES[id]; });
     });
   });
   return total;
@@ -806,58 +765,47 @@ function buildGarmentUI(co) {
   container.innerHTML = '';
 
   GARMENTS.forEach(g => {
-    const gs = state.garments[co][g.id];
-    const active = isBulkDiscountActive();
-    const ep = getEffectiveGarmentPrice(g.id);
+    const gs      = state.garments[co][g.id];
+    const moqMet  = isMOQMet();
+    const qty     = getTotalGarmentQty();
+    const ep      = getEffectiveGarmentPrice(g.id);
 
     const row = document.createElement('div');
     row.className = 'garment-row' + (gs.enabled ? '' : ' disabled');
     row.id = `row_${co}_${g.id}`;
 
     const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.className = 'garment-check';
-    cb.checked = gs.enabled;
+    cb.type = 'checkbox'; cb.className = 'garment-check'; cb.checked = gs.enabled;
     cb.addEventListener('change', () => toggleGarment(co, g.id, cb.checked));
     row.appendChild(cb);
 
-    const labelWrap = document.createElement('div');
-    labelWrap.className = 'garment-label-wrap';
+    const labelWrap = document.createElement('div'); labelWrap.className = 'garment-label-wrap';
+    const lbl       = document.createElement('div'); lbl.className = 'garment-label'; lbl.textContent = g.label;
+    const fabricLbl = document.createElement('div'); fabricLbl.style.cssText = 'font-size:10px;color:var(--muted);margin-top:1px;'; fabricLbl.textContent = g.fabric;
 
-    const lbl = document.createElement('div');
-    lbl.className = 'garment-label';
-    lbl.textContent = g.label;
+    const priceWrap   = document.createElement('div'); priceWrap.className = 'garment-price-wrap'; priceWrap.dataset.priceGid = g.id;
+    const basePrice   = document.createElement('div'); basePrice.className = 'garment-base-price';
+    basePrice.textContent = formatINR(PRICES[g.id]) + ' / pc';
+    if (!moqMet && qty > 0) { basePrice.style.textDecoration = 'line-through'; basePrice.style.color = 'var(--muted)'; }
 
-    // Price display wrapper — marked with data attribute for live updates
-    const priceWrap = document.createElement('div');
-    priceWrap.className = 'garment-price-wrap';
-    priceWrap.dataset.priceGid = g.id;
+    const surchargePrice = document.createElement('div'); surchargePrice.className = 'garment-surcharge-price' + (!moqMet && qty > 0 ? ' visible' : '');
+    surchargePrice.textContent = formatINR(ep) + ' / pc (+7%)';
 
-    const unitPrice = document.createElement('div');
-    unitPrice.className = 'garment-unit-price' + (active ? ' has-discount' : '');
-    unitPrice.textContent = formatINR(PRICES[g.id]) + ' / pc';
+    const surchargeTag = document.createElement('div'); surchargeTag.className = 'garment-surcharge-tag' + (!moqMet && qty > 0 ? ' visible' : '');
+    surchargeTag.textContent = '+7% SURCHARGE';
 
-    const discountedPrice = document.createElement('div');
-    discountedPrice.className = 'garment-discounted-price' + (active ? ' visible' : '');
-    discountedPrice.textContent = formatINR(ep) + ' / pc';
+    const moqLabel = document.createElement('div'); moqLabel.className = 'garment-moq-label' + (moqMet ? ' visible' : '');
+    moqLabel.textContent = '✓ MOQ price';
 
-    const discountTag = document.createElement('div');
-    discountTag.className = 'garment-discount-tag' + (active ? ' visible' : '');
-    discountTag.textContent = '−5% BULK';
+    priceWrap.appendChild(basePrice); priceWrap.appendChild(surchargePrice);
+    priceWrap.appendChild(surchargeTag); priceWrap.appendChild(moqLabel);
 
-    priceWrap.appendChild(unitPrice);
-    priceWrap.appendChild(discountedPrice);
-    priceWrap.appendChild(discountTag);
-
-    labelWrap.appendChild(lbl);
-    labelWrap.appendChild(priceWrap);
+    labelWrap.appendChild(lbl); labelWrap.appendChild(fabricLbl); labelWrap.appendChild(priceWrap);
     row.appendChild(labelWrap);
 
-    const rightDiv = document.createElement('div');
-    rightDiv.className = 'garment-right';
+    const rightDiv = document.createElement('div'); rightDiv.className = 'garment-right';
+    const sizesDiv = document.createElement('div'); sizesDiv.className = 'size-tabs';
 
-    const sizesDiv = document.createElement('div');
-    sizesDiv.className = 'size-tabs';
     GARMENT_SIZES[g.id].forEach(sz => {
       const tab = document.createElement('div');
       tab.className = 'size-tab' + (gs.sizes[sz] !== undefined ? ' sel' : '');
@@ -887,44 +835,25 @@ function buildGarmentUI(co) {
 function renderGarmentQtyInto(gs, gid, co, area) {
   area.innerHTML = '';
   const sizes = Object.keys(gs.sizes);
-  if (!sizes.length) {
-    area.innerHTML = '<span style="font-size:11px;color:var(--muted);">← Pick a size above</span>';
-    return;
-  }
-  const active = isBulkDiscountActive();
-  const ep = getEffectiveGarmentPrice(gid);
-
+  if (!sizes.length) { area.innerHTML = '<span style="font-size:11px;color:var(--muted);">← Pick a size above</span>'; return; }
+  const moqMet = isMOQMet();
+  const qty    = getTotalGarmentQty();
+  const ep     = getEffectiveGarmentPrice(gid);
   sizes.forEach(sz => {
-    const block = document.createElement('div');
-    block.className = 'size-qty-block';
-
-    const szLbl = document.createElement('div');
-    szLbl.className = 'size-qty-label';
-    szLbl.textContent = 'Size ' + sz;
-
+    const block = document.createElement('div'); block.className = 'size-qty-block';
+    const szLbl = document.createElement('div'); szLbl.className = 'size-qty-label'; szLbl.textContent = 'Size ' + sz;
     const subtotalEl = document.createElement('div');
-    subtotalEl.className = 'size-qty-subtotal' + (active ? ' discounted' : '');
+    subtotalEl.className = 'size-qty-subtotal' + (!moqMet && qty > 0 ? ' surcharge' : '');
     subtotalEl.textContent = formatINR(gs.sizes[sz] * ep);
-    // Tag for live update
-    subtotalEl.dataset.subtotalGid = gid;
-    subtotalEl.dataset.subtotalSz  = sz;
-    subtotalEl.dataset.subtotalCo  = co;
-
-    const { wrap } = makeQtyControl({
-      value: gs.sizes[sz],
-      min: 1,
-      onUpdate: (v) => {
-        gs.sizes[sz] = v;
-        const curEp = getEffectiveGarmentPrice(gid);
-        subtotalEl.textContent = formatINR(v * curEp);
-        subtotalEl.classList.toggle('discounted', isBulkDiscountActive());
-        updateDiscountUI();
-      }
-    });
-
-    block.appendChild(szLbl);
-    block.appendChild(wrap);
-    block.appendChild(subtotalEl);
+    subtotalEl.dataset.subtotalGid = gid; subtotalEl.dataset.subtotalSz = sz; subtotalEl.dataset.subtotalCo = co;
+    const { wrap } = makeQtyControl({ value: gs.sizes[sz], min: 1, onUpdate: (v) => {
+      gs.sizes[sz] = v;
+      const ep2 = getEffectiveGarmentPrice(gid);
+      subtotalEl.textContent = formatINR(v * ep2);
+      subtotalEl.classList.toggle('surcharge', !isMOQMet() && getTotalGarmentQty() > 0);
+      updateDiscountUI();
+    }});
+    block.appendChild(szLbl); block.appendChild(wrap); block.appendChild(subtotalEl);
     area.appendChild(block);
   });
 }
@@ -939,10 +868,7 @@ function toggleGarment(co, gid, enabled) {
   const gs = state.garments[co][gid];
   gs.enabled = enabled;
   if (!enabled) { gs.sizes = {}; buildGarmentUI(co); }
-  else {
-    const row = document.getElementById(`row_${co}_${gid}`);
-    if (row) row.classList.remove('disabled');
-  }
+  else { const row = document.getElementById(`row_${co}_${gid}`); if (row) row.classList.remove('disabled'); }
   updateDiscountUI();
 }
 
@@ -969,35 +895,28 @@ function toggleCompany(card) {
 function buildAccessories() {
   const grid = document.getElementById('accGrid');
   grid.innerHTML = '';
-
   ACCESSORIES.forEach(acc => {
-    const accData = state.accessories[acc.id];
+    const accData    = state.accessories[acc.id];
     const isSelected = accData !== undefined;
-
     const card = document.createElement('div');
     card.className = 'acc-card' + (isSelected ? ' selected' : '');
     card.id = 'acc_' + acc.id;
 
-    const header = document.createElement('div');
-    header.className = 'acc-card-header';
-
+    const header = document.createElement('div'); header.className = 'acc-card-header';
     const iconEl = document.createElement('div'); iconEl.className = 'acc-icon'; iconEl.textContent = acc.icon;
     const nameWrap = document.createElement('div'); nameWrap.style.flex = '1';
     const nameEl = document.createElement('div'); nameEl.className = 'acc-name'; nameEl.textContent = acc.name;
-    const priceEl = document.createElement('div'); priceEl.className = 'acc-unit-price'; priceEl.textContent = formatINR(PRICES[acc.id]) + ' / pc';
-    nameWrap.appendChild(nameEl);
-    nameWrap.appendChild(priceEl);
+    const priceEl = document.createElement('div'); priceEl.className = 'acc-unit-price';
+    priceEl.textContent = formatINR(PRICES[acc.id]) + ' / pc';
+    const priceNote = document.createElement('div'); priceNote.className = 'acc-unit-price-note';
+    priceNote.textContent = 'excl. GST (5%)';
+    nameWrap.appendChild(nameEl); nameWrap.appendChild(priceEl); nameWrap.appendChild(priceNote);
     const toggleIcon = document.createElement('div'); toggleIcon.className = 'acc-toggle-icon'; toggleIcon.textContent = '+';
-
-    header.appendChild(iconEl);
-    header.appendChild(nameWrap);
-    header.appendChild(toggleIcon);
+    header.appendChild(iconEl); header.appendChild(nameWrap); header.appendChild(toggleIcon);
     header.addEventListener('click', () => { toggleAcc(acc.id, acc.hasSize, card); buildAccessories(); });
     card.appendChild(header);
 
-    const coRows = document.createElement('div');
-    coRows.className = 'acc-company-rows';
-
+    const coRows = document.createElement('div'); coRows.className = 'acc-company-rows';
     if (state.companies.length === 0) {
       const notice = document.createElement('div');
       notice.style.cssText = 'padding:12px 16px;font-size:12px;color:var(--muted);';
@@ -1006,28 +925,16 @@ function buildAccessories() {
     } else {
       state.companies.forEach(co => {
         const meta = CO_META[co];
-
         if (acc.hasSize) {
           const shoeData = (accData && accData[co]) ? accData[co] : {};
-          const row = document.createElement('div');
-          row.className = 'shoe-co-row';
-
-          const coHeader = document.createElement('div');
-          coHeader.className = 'shoe-co-header';
+          const row = document.createElement('div'); row.className = 'shoe-co-row';
+          const coHeader = document.createElement('div'); coHeader.className = 'shoe-co-header';
           coHeader.innerHTML = `<div class="acc-co-dot" style="background:${meta.color};"></div><div class="shoe-co-label">${meta.name}</div>`;
           row.appendChild(coHeader);
-
-          const szLabel = document.createElement('div');
-          szLabel.className = 'shoe-size-label';
-          szLabel.textContent = 'Select Sizes (UK)';
+          const szLabel = document.createElement('div'); szLabel.className = 'shoe-size-label'; szLabel.textContent = 'Select Sizes (UK)';
           row.appendChild(szLabel);
-
-          const sizesRow = document.createElement('div');
-          sizesRow.className = 'shoe-sizes';
-
-          const qtyArea = document.createElement('div');
-          qtyArea.className = 'shoe-qty-area';
-
+          const sizesRow = document.createElement('div'); sizesRow.className = 'shoe-sizes';
+          const qtyArea = document.createElement('div'); qtyArea.className = 'shoe-qty-area';
           SHOE_SIZES.forEach(sz => {
             const tab = document.createElement('div');
             tab.className = 'shoe-size-tab' + (shoeData[sz] !== undefined ? ' sel' : '');
@@ -1042,52 +949,30 @@ function buildAccessories() {
             });
             sizesRow.appendChild(tab);
           });
-
           row.appendChild(sizesRow);
-
           if (accData && accData[co]) renderShoeQty(acc.id, co, qtyArea);
           else qtyArea.innerHTML = '<span style="font-size:11px;color:var(--muted);margin-top:2px;">← Pick a size above</span>';
           row.appendChild(qtyArea);
-
           coRows.appendChild(row);
-
         } else {
           const qty = (accData && accData[co] !== undefined) ? accData[co] : 0;
-          const price = PRICES[acc.id];
-
-          const row = document.createElement('div');
-          row.className = 'acc-co-row';
-
-          const infoDiv = document.createElement('div');
-          infoDiv.className = 'acc-co-info';
+          const row = document.createElement('div'); row.className = 'acc-co-row';
+          const infoDiv = document.createElement('div'); infoDiv.className = 'acc-co-info';
           infoDiv.innerHTML = `<div class="acc-co-dot" style="background:${meta.color};"></div><div class="acc-co-name">${meta.name}</div>`;
-
-          const rightDiv = document.createElement('div');
-          rightDiv.className = 'acc-co-right';
-
-          const subtotalEl = document.createElement('div');
-          subtotalEl.className = 'acc-co-subtotal';
-          subtotalEl.textContent = qty > 0 ? formatINR(qty * price) : '—';
-
-          const { wrap } = makeQtyControl({
-            value: qty,
-            min: 0,
-            onUpdate: (v) => {
-              if (!state.accessories[acc.id]) state.accessories[acc.id] = {};
-              state.accessories[acc.id][co] = v;
-              subtotalEl.textContent = v > 0 ? formatINR(v * price) : '—';
-            }
-          });
-
-          rightDiv.appendChild(wrap);
-          rightDiv.appendChild(subtotalEl);
-          row.appendChild(infoDiv);
-          row.appendChild(rightDiv);
+          const rightDiv = document.createElement('div'); rightDiv.className = 'acc-co-right';
+          const subtotalEl = document.createElement('div'); subtotalEl.className = 'acc-co-subtotal';
+          subtotalEl.textContent = qty > 0 ? formatINR(qty * PRICES[acc.id]) : '—';
+          const { wrap } = makeQtyControl({ value: qty, min: 0, onUpdate: (v) => {
+            if (!state.accessories[acc.id]) state.accessories[acc.id] = {};
+            state.accessories[acc.id][co] = v;
+            subtotalEl.textContent = v > 0 ? formatINR(v * PRICES[acc.id]) : '—';
+          }});
+          rightDiv.appendChild(wrap); rightDiv.appendChild(subtotalEl);
+          row.appendChild(infoDiv); row.appendChild(rightDiv);
           coRows.appendChild(row);
         }
       });
     }
-
     card.appendChild(coRows);
     grid.appendChild(card);
   });
@@ -1097,47 +982,22 @@ function renderShoeQty(accId, co, area) {
   area.innerHTML = '';
   const data = (state.accessories[accId] && state.accessories[accId][co]) || {};
   const selected = Object.keys(data);
-  if (!selected.length) {
-    area.innerHTML = '<span style="font-size:11px;color:var(--muted);margin-top:2px;">← Pick a size above</span>';
-    return;
-  }
-  const price = PRICES[accId];
+  if (!selected.length) { area.innerHTML = '<span style="font-size:11px;color:var(--muted);margin-top:2px;">← Pick a size above</span>'; return; }
   selected.forEach(sz => {
-    const wrap = document.createElement('div');
-    wrap.className = 'shoe-size-qty';
-
-    const tag = document.createElement('div');
-    tag.className = 'shoe-sz-tag';
-    tag.textContent = 'UK ' + sz;
-
-    const subtotalEl = document.createElement('div');
-    subtotalEl.className = 'shoe-size-subtotal';
-    subtotalEl.textContent = formatINR(data[sz] * price);
-
-    const { wrap: qw } = makeQtyControl({
-      value: data[sz],
-      min: 1,
-      onUpdate: (v) => {
-        state.accessories[accId][co][sz] = v;
-        subtotalEl.textContent = formatINR(v * price);
-      }
-    });
-
-    wrap.appendChild(tag);
-    wrap.appendChild(qw);
-    wrap.appendChild(subtotalEl);
+    const wrap = document.createElement('div'); wrap.className = 'shoe-size-qty';
+    const tag  = document.createElement('div'); tag.className = 'shoe-sz-tag'; tag.textContent = 'UK ' + sz;
+    const subtotalEl = document.createElement('div'); subtotalEl.className = 'shoe-size-subtotal'; subtotalEl.textContent = formatINR(data[sz] * PRICES[accId]);
+    const { wrap: qw } = makeQtyControl({ value: data[sz], min: 1, onUpdate: (v) => { state.accessories[accId][co][sz] = v; subtotalEl.textContent = formatINR(v * PRICES[accId]); }});
+    wrap.appendChild(tag); wrap.appendChild(qw); wrap.appendChild(subtotalEl);
     area.appendChild(wrap);
   });
 }
 
 function toggleAcc(id, hasSize, card) {
-  if (card.classList.contains('selected')) {
-    delete state.accessories[id];
-  } else {
-    if (!state.accessories[id]) {
-      state.accessories[id] = {};
-      state.companies.forEach(co => { state.accessories[id][co] = hasSize ? {} : 0; });
-    }
+  if (card.classList.contains('selected')) { delete state.accessories[id]; }
+  else {
+    state.accessories[id] = {};
+    state.companies.forEach(co => { state.accessories[id][co] = hasSize ? {} : 0; });
   }
 }
 
@@ -1160,20 +1020,14 @@ function goStep(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── Validation ────────────────────────────────────────────────────────────────
-
 function validate(step) {
   if (step === 1) {
     const name  = document.getElementById('c_name').value.trim();
     const org   = document.getElementById('c_org').value.trim();
     const phone = document.getElementById('c_phone').value.trim();
     const addr  = document.getElementById('c_addr').value.trim();
-    if (!name || !org || !phone || !addr) {
-      alert('Please fill all required fields (Name, Company, Mobile, Address).');
-      return false;
-    }
-    state.customer = {
-      name, org, phone, addr,
+    if (!name || !org || !phone || !addr) { alert('Please fill all required fields (Name, Company, Mobile, Address).'); return false; }
+    state.customer = { name, org, phone, addr,
       gst:   document.getElementById('c_gst').value.trim(),
       email: document.getElementById('c_email').value.trim(),
       date:  document.getElementById('c_date').value.trim(),
@@ -1182,10 +1036,7 @@ function validate(step) {
     return true;
   }
   if (step === 2) {
-    if (!state.companies.length) {
-      document.getElementById('coErr').style.display = 'block';
-      return false;
-    }
+    if (!state.companies.length) { document.getElementById('coErr').style.display = 'block'; return false; }
     return true;
   }
   return true;
@@ -1194,55 +1045,42 @@ function validate(step) {
 // ── Summary ───────────────────────────────────────────────────────────────────
 
 function buildSummary() {
-  const el = document.getElementById('summaryContent');
-  const discountActive = isBulkDiscountActive();
-  const totalQty = getTotalGarmentQty();
+  const el         = document.getElementById('summaryContent');
+  const moqMet     = isMOQMet();
+  const totalQty   = getTotalGarmentQty();
   let html = '';
 
-  html += `<div class="summary-block">
-    <div class="summary-head">👤 Customer Details</div>
-    <div class="summary-body">
-      <div class="summary-row"><span class="summary-key">Name</span><span class="summary-val">${state.customer.name}</span></div>
-      <div class="summary-row"><span class="summary-key">Organisation</span><span class="summary-val">${state.customer.org}</span></div>
-      ${state.customer.gst ? `<div class="summary-row"><span class="summary-key">GST No.</span><span class="summary-val">${state.customer.gst}</span></div>` : ''}
-      <div class="summary-row"><span class="summary-key">Mobile</span><span class="summary-val">${state.customer.phone}</span></div>
-      ${state.customer.email ? `<div class="summary-row"><span class="summary-key">Email</span><span class="summary-val">${state.customer.email}</span></div>` : ''}
-      <div class="summary-row"><span class="summary-key">Delivery Address</span><span class="summary-val">${state.customer.addr}</span></div>
-      ${state.customer.date ? `<div class="summary-row"><span class="summary-key">Required By</span><span class="summary-val">${state.customer.date}</span></div>` : ''}
-      ${state.customer.po ? `<div class="summary-row"><span class="summary-key">PO / Reference</span><span class="summary-val">${state.customer.po}</span></div>` : ''}
-    </div>
-  </div>`;
+  html += `<div class="summary-block"><div class="summary-head">👤 Customer Details</div><div class="summary-body">
+    <div class="summary-row"><span class="summary-key">Name</span><span class="summary-val">${state.customer.name}</span></div>
+    <div class="summary-row"><span class="summary-key">Organisation</span><span class="summary-val">${state.customer.org}</span></div>
+    ${state.customer.gst ? `<div class="summary-row"><span class="summary-key">GST No.</span><span class="summary-val">${state.customer.gst}</span></div>` : ''}
+    <div class="summary-row"><span class="summary-key">Mobile</span><span class="summary-val">${state.customer.phone}</span></div>
+    ${state.customer.email ? `<div class="summary-row"><span class="summary-key">Email</span><span class="summary-val">${state.customer.email}</span></div>` : ''}
+    <div class="summary-row"><span class="summary-key">Delivery Address</span><span class="summary-val">${state.customer.addr}</span></div>
+    ${state.customer.date ? `<div class="summary-row"><span class="summary-key">Required By</span><span class="summary-val">${state.customer.date}</span></div>` : ''}
+    ${state.customer.po ? `<div class="summary-row"><span class="summary-key">PO / Reference</span><span class="summary-val">${state.customer.po}</span></div>` : ''}
+  </div></div>`;
 
-  let garmentSubtotalBase = 0;  // before discount
-  let garmentSubtotalDisc = 0;  // after discount
-
+  let garmentSubBase = 0, garmentSubEffective = 0;
   state.companies.forEach(co => {
-    const coName = CO_META[co].name;
     let rows = '';
     GARMENTS.forEach(g => {
       const gd = state.garments[co]?.[g.id];
       if (!gd?.enabled) return;
       const sizes = Object.entries(gd.sizes);
       if (!sizes.length) return;
-      const lineTotalBase = sizes.reduce((s, [, q]) => s + q * PRICES[g.id], 0);
-      const ep = getEffectiveGarmentPrice(g.id);
-      const lineTotalDisc = sizes.reduce((s, [, q]) => s + q * ep, 0);
-      garmentSubtotalBase += lineTotalBase;
-      garmentSubtotalDisc += lineTotalDisc;
-      const sizeStr = sizes.map(([s, q]) => `${s} × ${q}`).join(', ');
-      const priceLabel = discountActive
-        ? `<span style="text-decoration:line-through;color:var(--muted);font-weight:400;">${formatINR(PRICES[g.id])}/pc</span> <span style="color:var(--discount-text);font-weight:700;">${formatINR(ep)}/pc</span>`
-        : `${formatINR(PRICES[g.id])}/pc`;
-      rows += `<div class="summary-row">
-        <span class="summary-key">${g.label} <span style="font-size:10px;">(${priceLabel})</span></span>
-        <span class="summary-val">${sizeStr} = <strong>${formatINR(lineTotalDisc)}</strong></span>
-      </div>`;
+      const lineBase = sizes.reduce((s,[,q]) => s + q * PRICES[g.id], 0);
+      const ep       = getEffectiveGarmentPrice(g.id);
+      const lineEff  = sizes.reduce((s,[,q]) => s + q * ep, 0);
+      garmentSubBase += lineBase; garmentSubEffective += lineEff;
+      const sizeStr = sizes.map(([s,q]) => `${s} × ${q}`).join(', ');
+      const priceLabel = !moqMet && totalQty > 0
+        ? `<span style="text-decoration:line-through;color:var(--muted);font-weight:400;">${formatINR(PRICES[g.id])}/pc</span> <span style="color:var(--surcharge-text);font-weight:700;">${formatINR(ep)}/pc</span>`
+        : `<span style="color:var(--price-color);font-weight:600;">${formatINR(PRICES[g.id])}/pc</span>`;
+      rows += `<div class="summary-row"><span class="summary-key">${g.label} <span style="font-size:10px;">(${priceLabel})</span></span><span class="summary-val">${sizeStr} = <strong>${formatINR(lineEff)}</strong></span></div>`;
     });
     if (!rows) rows = `<div class="summary-row" style="color:var(--muted);font-size:12px;"><span class="summary-key">No garments selected</span><span></span></div>`;
-    html += `<div class="summary-block">
-      <div class="summary-head" style="border-left:4px solid ${CO_META[co].color};">${coName} — Uniforms</div>
-      <div class="summary-body">${rows}</div>
-    </div>`;
+    html += `<div class="summary-block"><div class="summary-head" style="border-left:4px solid ${CO_META[co].color};">${CO_META[co].name} — Uniforms</div><div class="summary-body">${rows}</div></div>`;
   });
 
   const accKeys = Object.keys(state.accessories);
@@ -1251,117 +1089,95 @@ function buildSummary() {
     let accRows = '';
     accKeys.forEach(id => {
       const acc = ACCESSORIES.find(a => a.id === id);
-      let lineTotal = 0;
-      let detail = '';
+      let lineTotal = 0, detail = '';
       if (acc.hasSize) {
         const parts = [];
         Object.entries(state.accessories[id]).forEach(([co, sizes]) => {
-          const s = Object.entries(sizes).map(([sz, q]) => { lineTotal += q * PRICES[id]; return `UK${sz}×${q}`; }).join(', ');
+          const s = Object.entries(sizes).map(([sz,q]) => { lineTotal += q*PRICES[id]; return `UK${sz}×${q}`; }).join(', ');
           if (s) parts.push(`${CO_META[co].name}: ${s}`);
         });
         detail = parts.join(' | ') || '—';
       } else {
         const parts = [];
-        Object.entries(state.accessories[id]).forEach(([co, q]) => {
-          if (q > 0) { lineTotal += q * PRICES[id]; parts.push(`${CO_META[co].name}: ${q}`); }
-        });
+        Object.entries(state.accessories[id]).forEach(([co,q]) => { if(q>0){lineTotal+=q*PRICES[id];parts.push(`${CO_META[co].name}: ${q}`);}});
         detail = parts.join(' · ') || '—';
       }
       accSubtotal += lineTotal;
-      accRows += `<div class="summary-row">
-        <span class="summary-key">${acc.icon} ${acc.name} <span style="font-size:10px;">(${formatINR(PRICES[id])}/pc)</span></span>
-        <span class="summary-val">${detail}${lineTotal > 0 ? ` = <strong>${formatINR(lineTotal)}</strong>` : ''}</span>
-      </div>`;
+      accRows += `<div class="summary-row"><span class="summary-key">${acc.icon} ${acc.name} <span style="font-size:10px;">(${formatINR(PRICES[id])}/pc)</span></span><span class="summary-val">${detail}${lineTotal>0?` = <strong>${formatINR(lineTotal)}</strong>`:''}</span></div>`;
     });
-    html += `<div class="summary-block">
-      <div class="summary-head">🎒 Accessories</div>
-      <div class="summary-body">${accRows}</div>
-    </div>`;
+    html += `<div class="summary-block"><div class="summary-head">🎒 Accessories</div><div class="summary-body">${accRows}</div></div>`;
   }
 
-  const discountAmount = discountActive ? (garmentSubtotalBase - garmentSubtotalDisc) : 0;
-  const subtotal = garmentSubtotalDisc + accSubtotal;
-  const garmentTax = Math.round(garmentSubtotalDisc * GST_GARMENT);
-  const accTax     = Math.round(accSubtotal * GST_ACCESSORY);
-  const totalTax   = garmentTax + accTax;
+  const surchargeAmount  = !moqMet && totalQty > 0 ? (garmentSubEffective - garmentSubBase) : 0;
+  const subtotal   = garmentSubEffective + accSubtotal;
+  const gTax       = Math.round(garmentSubEffective * GST_GARMENT);
+  const aTax       = Math.round(accSubtotal * GST_ACCESSORY);
+  const totalTax   = gTax + aTax;
   const grandTotal = subtotal + totalTax;
 
-  html += `<div class="price-summary-block">
-    <div class="price-summary-head">💰 Price Breakdown &amp; Estimated Total</div>
-    <div class="price-summary-body">`;
-
-  if (garmentSubtotalBase > 0) {
-    html += `<div class="price-row"><span class="price-row-key">Garments (base price)</span><span class="price-row-val">${formatINR(garmentSubtotalBase)}</span></div>`;
+  html += `<div class="price-summary-block"><div class="price-summary-head">💰 Price Breakdown &amp; Estimated Total</div><div class="price-summary-body">`;
+  if (garmentSubBase > 0)
+    html += `<div class="price-row"><span class="price-row-key">Garments (MOQ price — ${totalQty} pcs)</span><span class="price-row-val">${formatINR(garmentSubBase)}</span></div>`;
+  if (!moqMet && totalQty > 0 && surchargeAmount > 0) {
+    html += `<div class="price-row surcharge-row"><span class="price-row-key">⚠️ Small Qty Surcharge (+7% on ${totalQty} pcs below MOQ 20)</span><span class="price-row-val">+${formatINR(surchargeAmount)}</span></div>`;
+    html += `<div class="price-row"><span class="price-row-key">Garments (after +7% surcharge)</span><span class="price-row-val">${formatINR(garmentSubEffective)}</span></div>`;
   }
-  if (discountActive && discountAmount > 0) {
-    html += `<div class="price-row discount-row"><span class="price-row-key">🏷️ Bulk Discount (5% on ${totalQty} garments)</span><span class="price-row-val">−${formatINR(discountAmount)}</span></div>`;
-    html += `<div class="price-row"><span class="price-row-key">Garments (after discount)</span><span class="price-row-val">${formatINR(garmentSubtotalDisc)}</span></div>`;
-  }
-  if (accSubtotal > 0) {
+  if (accSubtotal > 0)
     html += `<div class="price-row"><span class="price-row-key">Accessories Subtotal</span><span class="price-row-val">${formatINR(accSubtotal)}</span></div>`;
-  }
   html += `<div class="price-row subtotal-row"><span class="price-row-key">Subtotal (before tax)</span><span class="price-row-val">${formatINR(subtotal)}</span></div>`;
-  if (garmentSubtotalDisc > 0) html += `<div class="price-row tax-row"><span class="price-row-key">GST on Garments (12%)</span><span class="price-row-val">${formatINR(garmentTax)}</span></div>`;
-  if (accSubtotal > 0)         html += `<div class="price-row tax-row"><span class="price-row-key">GST on Accessories (18%)</span><span class="price-row-val">${formatINR(accTax)}</span></div>`;
-  if (totalTax > 0)            html += `<div class="price-row tax-row"><span class="price-row-key">Total GST</span><span class="price-row-val">${formatINR(totalTax)}</span></div>`;
+  if (garmentSubEffective > 0) html += `<div class="price-row tax-row"><span class="price-row-key">GST on Garments (5%)</span><span class="price-row-val">${formatINR(gTax)}</span></div>`;
+  if (accSubtotal > 0)    html += `<div class="price-row tax-row"><span class="price-row-key">GST on Accessories (5%)</span><span class="price-row-val">${formatINR(aTax)}</span></div>`;
+  if (totalTax > 0)       html += `<div class="price-row tax-row"><span class="price-row-key">Total GST</span><span class="price-row-val">${formatINR(totalTax)}</span></div>`;
   html += `<div class="price-row grand-total-row"><span class="price-row-key">GRAND TOTAL (incl. GST)</span><span class="price-row-val">${formatINR(grandTotal)}</span></div>`;
   html += `</div></div>`;
 
-  if (discountActive) {
-    html += `<p class="tax-note" style="margin-bottom:4px;color:var(--discount-text);font-weight:600;">✅ Bulk discount of 5% applied — you saved ${formatINR(discountAmount)} on garments!</p>`;
-  }
-  html += `<p class="tax-note" style="margin-bottom:12px;">* Prices are indicative estimates. Final invoice may vary based on fabric, customisation &amp; freight.</p>`;
-
+  if (!moqMet && totalQty > 0)
+    html += `<p class="tax-note" style="margin-bottom:4px;color:var(--surcharge-text);font-weight:600;">⚠️ +7% small qty surcharge applied (${totalQty} pcs ordered, MOQ is 20). Order 20+ pieces to get best price!</p>`;
+  else if (moqMet)
+    html += `<p class="tax-note" style="margin-bottom:4px;color:var(--discount-text);font-weight:600;">✅ MOQ met — wholesale prices applied (${totalQty} pcs ordered).</p>`;
+  html += `<p class="tax-note" style="margin-bottom:12px;">* Prices are exclusive of GST. Final invoice may vary based on fabric, customisation &amp; freight. MOQ: 50–100 pcs per item for confirmed production.</p>`;
   el.innerHTML = html;
 }
 
 // ── Submit ────────────────────────────────────────────────────────────────────
 
 function submitForm() {
-  const ref = 'ORD-' + Date.now().toString(36).toUpperCase();
-  const discountActive = isBulkDiscountActive();
-
-  let garmentSubBase = 0;
-  let garmentSubDisc = 0;
+  const ref    = 'ORD-' + Date.now().toString(36).toUpperCase();
+  const moqMet = isMOQMet();
+  let garmentSubBase = 0, garmentSubEffective = 0;
   state.companies.forEach(co => {
     if (!state.garments[co]) return;
     Object.entries(state.garments[co]).forEach(([gid, gd]) => {
       if (!gd.enabled) return;
       const ep = getEffectiveGarmentPrice(gid);
-      Object.entries(gd.sizes).forEach(([, qty]) => {
-        garmentSubBase += qty * PRICES[gid];
-        garmentSubDisc += qty * ep;
-      });
+      Object.entries(gd.sizes).forEach(([,qty]) => { garmentSubBase += qty*PRICES[gid]; garmentSubEffective += qty*ep; });
     });
   });
-
-  const accSub    = calcAccessorySubtotal();
-  const subtotal  = garmentSubDisc + accSub;
-  const tax       = Math.round(garmentSubDisc * GST_GARMENT) + Math.round(accSub * GST_ACCESSORY);
+  const accSub     = calcAccessorySubtotal();
+  const subtotal   = garmentSubEffective + accSub;
+  const tax        = Math.round(garmentSubEffective * GST_GARMENT) + Math.round(accSub * GST_ACCESSORY);
   const grandTotal = subtotal + tax;
-  const discountAmount = garmentSubBase - garmentSubDisc;
+  const surchargeAmount = !moqMet ? (garmentSubEffective - garmentSubBase) : 0;
+  const totalQty   = getTotalGarmentQty();
 
   let msg = `*DIVINE UNIFORM ORDER* (${ref})%0A%0A`;
-  msg += `*Customer:* ${state.customer.name}%0A`;
-  msg += `*Org:* ${state.customer.org}%0A`;
+  msg += `*Customer:* ${state.customer.name}%0A*Org:* ${state.customer.org}%0A`;
   if (state.customer.gst)   msg += `*GST:* ${state.customer.gst}%0A`;
-  msg += `*Phone:* ${state.customer.phone}%0A`;
-  msg += `*Address:* ${state.customer.addr}%0A`;
+  msg += `*Phone:* ${state.customer.phone}%0A*Address:* ${state.customer.addr}%0A`;
   if (state.customer.email) msg += `*Email:* ${state.customer.email}%0A`;
   if (state.customer.date)  msg += `*Required By:* ${state.customer.date}%0A`;
   if (state.customer.po)    msg += `*PO:* ${state.customer.po}%0A`;
   msg += `%0A`;
 
   state.companies.forEach(co => {
-    const coName = CO_META[co].name;
     let lines = '';
     GARMENTS.forEach(g => {
       const gd = state.garments[co]?.[g.id];
       if (!gd?.enabled) return;
-      const s = Object.entries(gd.sizes).map(([sz, q]) => `${sz}×${q}`).join(', ');
+      const s = Object.entries(gd.sizes).map(([sz,q]) => `${sz}×${q}`).join(', ');
       if (s) lines += `• ${g.label}: ${s}%0A`;
     });
-    if (lines) msg += `*${coName} Garments:*%0A${lines}%0A`;
+    if (lines) msg += `*${CO_META[co].name} Garments:*%0A${lines}%0A`;
   });
 
   const accKeys = Object.keys(state.accessories);
@@ -1370,26 +1186,25 @@ function submitForm() {
     accKeys.forEach(id => {
       const acc = ACCESSORIES.find(a => a.id === id);
       if (acc.hasSize) {
-        const parts = Object.entries(state.accessories[id]).map(([co, sizes]) => {
-          const s = Object.entries(sizes).map(([sz, q]) => `UK${sz}×${q}`).join(', ');
+        const parts = Object.entries(state.accessories[id]).map(([co,sizes]) => {
+          const s = Object.entries(sizes).map(([sz,q]) => `UK${sz}×${q}`).join(', ');
           return s ? `${CO_META[co].name}: ${s}` : null;
         }).filter(Boolean).join(' | ');
         if (parts) aLines += `• ${acc.name}: ${parts}%0A`;
       } else {
-        const qtys = Object.entries(state.accessories[id])
-          .filter(([, q]) => q > 0)
-          .map(([co, q]) => `${CO_META[co].name}: ${q}`).join(', ');
+        const qtys = Object.entries(state.accessories[id]).filter(([,q])=>q>0).map(([co,q])=>`${CO_META[co].name}: ${q}`).join(', ');
         if (qtys) aLines += `• ${acc.name}: ${qtys}%0A`;
       }
     });
     if (aLines) msg += `*Accessories:*%0A${aLines}%0A`;
   }
 
-  if (discountActive && discountAmount > 0) {
-    msg += `%0A*5%25 Bulk Discount Applied:* −₹${Math.round(discountAmount).toLocaleString('en-IN')}%0A`;
-  }
-  msg += `%0A*Estimated Total (incl. GST):* ₹${Math.round(grandTotal).toLocaleString('en-IN')}%0A`;
-  msg += `%0A*End of Order ${ref}*`;
+  if (!moqMet && surchargeAmount > 0)
+    msg += `%0A*⚠️ Small Qty Surcharge (+7%25, ${totalQty} pcs < MOQ 20):* +₹${Math.round(surchargeAmount).toLocaleString('en-IN')}%0A`;
+  else if (moqMet)
+    msg += `%0A*✅ MOQ Met — Wholesale Price Applied (${totalQty} pcs)*%0A`;
+
+  msg += `%0A*Estimated Total (incl. GST 5%25):* ₹${Math.round(grandTotal).toLocaleString('en-IN')}%0A*End of Order ${ref}*`;
 
   window.open(`https://wa.me/919811417786?text=${msg}`);
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1400,7 +1215,7 @@ function submitForm() {
   const session = getSession();
   if (session) {
     const users = getUsers();
-    const user = users[session.phone];
+    const user  = users[session.phone];
     if (user) {
       if (!user.orders) user.orders = [];
       let garmentSummary = [];
@@ -1417,33 +1232,23 @@ function submitForm() {
       localStorage.setItem('du_users', JSON.stringify(users));
     }
   }
-
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── AUTH SYSTEM ───────────────────────────────────────────────────────────────
 
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem('du_users') || '{}'); } catch(e) { return {}; }
-}
-function getSession() {
-  try { return JSON.parse(localStorage.getItem('du_session') || 'null'); } catch(e) { return null; }
-}
-function setSession(phone, name) {
-  localStorage.setItem('du_session', JSON.stringify({ phone, name }));
-}
-function clearSession() {
-  localStorage.removeItem('du_session');
-}
+function getUsers()  { try { return JSON.parse(localStorage.getItem('du_users') || '{}'); } catch(e) { return {}; } }
+function getSession(){ try { return JSON.parse(localStorage.getItem('du_session') || 'null'); } catch(e) { return null; } }
+function setSession(phone, name) { localStorage.setItem('du_session', JSON.stringify({ phone, name })); }
+function clearSession() { localStorage.removeItem('du_session'); }
 
 function renderAuthBar() {
   const bar = document.getElementById('authBar');
   const session = getSession();
   if (session) {
-    bar.innerHTML =
-      '<div class="user-greeting">Hello, <strong>' + session.name.split(' ')[0] + '</strong></div>' +
-      '<button class="btn-auth btn-orders" onclick="openOrders()">My Orders</button>' +
-      '<button class="btn-auth btn-logout" onclick="doLogout()">Logout</button>';
+    bar.innerHTML = '<div class="user-greeting">Hello, <strong>'+session.name.split(' ')[0]+'</strong></div>'
+      + '<button class="btn-auth btn-orders" onclick="openOrders()">My Orders</button>'
+      + '<button class="btn-auth btn-logout" onclick="doLogout()">Logout</button>';
   } else {
     bar.innerHTML = '<button class="btn-auth" onclick="openModal(\'authModal\')">Login / Sign Up</button>';
   }
@@ -1457,7 +1262,7 @@ function switchTab(tab) {
   document.getElementById('signupForm').style.display = tab === 'signup' ? '' : 'none';
   document.getElementById('tabLogin').classList.toggle('active',  tab === 'login');
   document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
-  document.getElementById('loginMsg').textContent  = '';
+  document.getElementById('loginMsg').textContent = '';
   document.getElementById('signupMsg').textContent = '';
 }
 
@@ -1485,7 +1290,7 @@ function doSignup() {
   const addr  = document.getElementById('s_addr').value.trim();
   const pass  = document.getElementById('s_pass').value;
   const msg   = document.getElementById('signupMsg');
-  if (!name || !org || !phone || !addr || !pass) { msg.textContent = 'Please fill all required fields.'; return; }
+  if (!name||!org||!phone||!addr||!pass) { msg.textContent = 'Please fill all required fields.'; return; }
   const users = getUsers();
   if (users[phone]) { msg.textContent = 'Mobile already registered. Please login.'; return; }
   users[phone] = { name, org, phone, gst, email, addr, password: btoa(pass), orders: [] };
@@ -1501,30 +1306,26 @@ function doLogout() { clearSession(); renderAuthBar(); }
 
 function prefillCustomerDetails(user) {
   const fields = { c_name: user.name, c_org: user.org, c_phone: user.phone, c_gst: user.gst, c_email: user.email, c_addr: user.addr };
-  Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el && val) el.value = val; });
+  Object.entries(fields).forEach(([id,val]) => { const el = document.getElementById(id); if (el && val) el.value = val; });
 }
 
 function showAuthNotice(text) {
   let notice = document.getElementById('authNotice');
   if (!notice) {
-    notice = document.createElement('div');
-    notice.id = 'authNotice';
+    notice = document.createElement('div'); notice.id = 'authNotice';
     notice.style.cssText = 'background:var(--success);color:white;text-align:center;padding:10px 20px;font-size:12px;font-weight:600;letter-spacing:0.05em;position:fixed;top:0;left:0;right:0;z-index:9999;transition:opacity 0.5s;';
     document.body.prepend(notice);
   }
-  notice.textContent = text;
-  notice.style.opacity = '1';
-  notice.style.display = 'block';
+  notice.textContent = text; notice.style.opacity = '1'; notice.style.display = 'block';
   setTimeout(() => { notice.style.opacity = '0'; setTimeout(() => { notice.style.display = 'none'; }, 500); }, 3500);
 }
 
 function openOrders() {
-  const session = getSession();
-  if (!session) return;
-  const users = getUsers();
-  const user  = users[session.phone];
-  const orders = (user && user.orders) || [];
-  const body = document.getElementById('ordersBody');
+  const session = getSession(); if (!session) return;
+  const users   = getUsers();
+  const user    = users[session.phone];
+  const orders  = (user && user.orders) || [];
+  const body    = document.getElementById('ordersBody');
   if (!orders.length) {
     body.innerHTML = '<div class="no-orders"><div style="font-size:40px;margin-bottom:12px;">&#128230;</div><div style="font-weight:600;color:var(--text);margin-bottom:6px;">No orders yet</div><div>Your submitted orders will appear here.</div></div>';
   } else {
@@ -1535,15 +1336,10 @@ function openOrders() {
   openModal('ordersModal');
 }
 
-// Init
 (function init() {
   renderAuthBar();
   const session = getSession();
-  if (session) {
-    const users = getUsers();
-    const user  = users[session.phone];
-    if (user) prefillCustomerDetails(user);
-  }
+  if (session) { const users = getUsers(); const user = users[session.phone]; if (user) prefillCustomerDetails(user); }
   document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   });
