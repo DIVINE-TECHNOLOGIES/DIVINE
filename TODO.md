@@ -1,12 +1,11 @@
-# Task: Add JIO-BP Company to DIVINE Uniform Order Form
+# Task: Add Matty Trouser (₹320) to DIVINE Uniform Order Form
 
 ## Steps to Complete:
-- [x] Step 1: Add new CSS class for JIO-BP logo in <style> section
-- [x] Step 2: Add new company card to .company-grid in Step 2 HTML
-- [x] Step 3: Add new .uniform-block for uni_JIOBP to #uniformBuilders
-- [x] Step 4: Update CO_META JS object with JIOBP entry
-- [x] Step 5: Update "Serving:" text in page header
-- [x] Step 6: Test functionality and attempt completion
+- [x] Step 1: Add entry to GARMENTS array (id: 'matty_trouser', label: 'Matty Trouser', fabric: 'Matty Fabric')
+- [x] Step 2: Add price to PRICES object (matty_trouser: 320)
+- [x] Step 3: Add sizes to GARMENT_SIZES (matty_trouser: ['28','30','32','34','36','38','40'])
+- [x] Step 4: Test rendering, pricing, MOQ/surcharge logic
+- [x] Step 5: Update this TODO.md with completion status
+- [x] Step 6: Demo with browser open command
 
-**Task complete!** JIO-BP fully integrated and tested.
-
+**Task complete!** Matty Trouser added successfully to all companies. Fully functional with dynamic pricing, sizes, MOQ/surcharge logic intact.
