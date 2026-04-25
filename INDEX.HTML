@@ -442,9 +442,342 @@
     .toast.err     { border-left:3px solid var(--adm-red); }
     @keyframes slideInR { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateY(0)} }
 
+    /* Customer UI refresh */
+    #customerScreen {
+      --cust-bg: #f6f7f8;
+      --cust-surface: #ffffff;
+      --cust-surface-soft: #f9fafb;
+      --cust-border: #e4e7ec;
+      --cust-border-strong: #cfd6df;
+      --cust-text: #171717;
+      --cust-muted: #667085;
+      --cust-primary: #b42318;
+      --cust-primary-dark: #8f1d16;
+      --cust-focus: #2563eb;
+      --cust-shadow: 0 18px 48px rgba(18, 25, 38, 0.08);
+      --cust-shadow-soft: 0 10px 28px rgba(18, 25, 38, 0.06);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(180,35,24,0.08), transparent 30%),
+        linear-gradient(180deg, #ffffff 0%, var(--cust-bg) 360px);
+      color: var(--cust-text);
+      min-height: 100vh;
+    }
+
+    #customerScreen .top-banner {
+      background: #111827;
+      color: #f9fafb;
+      padding: 8px 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    #customerScreen .page-header {
+      max-width: 1180px;
+      margin: 0 auto 28px;
+      padding: 30px 24px 26px;
+      background: transparent;
+      border-bottom: 0;
+      align-items: center;
+    }
+
+    .brand-panel { display:flex; flex-direction:column; gap:8px; max-width:620px; }
+    #customerScreen .brand {
+      color: #111827;
+      font-size: 50px;
+      line-height: 0.95;
+      letter-spacing: 0.04em;
+    }
+    #customerScreen .brand span { color: var(--cust-primary); }
+    #customerScreen .page-sub {
+      color: #374151;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .header-note {
+      color: var(--cust-muted);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 560px;
+    }
+    .header-aside { display:flex; flex-direction:column; align-items:flex-end; gap:14px; }
+    .service-strip { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; max-width:420px; }
+    .service-chip {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid var(--cust-border);
+      color: #344054;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 7px 10px;
+      border-radius: 999px;
+      box-shadow: 0 5px 16px rgba(18,25,38,0.04);
+    }
+
+    #customerScreen .form-wrap { max-width: 980px; padding: 0 24px 38px; }
+    #customerScreen .steps {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      overflow: hidden;
+      margin-bottom: 18px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--cust-border);
+      border-radius: 8px;
+      box-shadow: var(--cust-shadow-soft);
+      backdrop-filter: blur(12px);
+    }
+    #customerScreen .step {
+      border-right: 1px solid var(--cust-border);
+      opacity: 1;
+      padding: 14px 16px;
+      color: var(--cust-muted);
+      background: transparent;
+    }
+    #customerScreen .step.active { background: #fff7f6; color: var(--cust-text); }
+    #customerScreen .step.done { color: #14532d; background: #f0fdf4; }
+    #customerScreen .step-num {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--cust-border-strong);
+      background: #fff;
+      color: #475467;
+      font-weight: 800;
+    }
+    #customerScreen .step.active .step-num {
+      background: var(--cust-primary);
+      border-color: var(--cust-primary);
+      color: #fff;
+    }
+    #customerScreen .step.done .step-num {
+      background: #16a34a;
+      border-color: #16a34a;
+      color: #fff;
+    }
+    #customerScreen .step-label { font-weight: 700; color: inherit; }
+
+    #customerScreen .section,
+    #customerScreen .success-screen {
+      background: var(--cust-surface);
+      border: 1px solid var(--cust-border);
+      border-radius: 8px;
+      box-shadow: var(--cust-shadow);
+      overflow: hidden;
+    }
+    #customerScreen .section-head {
+      background: #111827;
+      color: #fff;
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    #customerScreen .section-icon {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 8px;
+      font-size: 18px;
+    }
+    #customerScreen .section-title { font-size: 25px; letter-spacing: 0.05em; }
+    #customerScreen .section-body { padding: 30px 28px; }
+
+    #customerScreen label,
+    #customerScreen .auth-label {
+      color: #475467;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+    }
+    #customerScreen input[type="text"],
+    #customerScreen input[type="email"],
+    #customerScreen input[type="tel"],
+    #customerScreen input[type="number"],
+    #customerScreen select,
+    #customerScreen textarea {
+      background: #fff;
+      border: 1px solid var(--cust-border-strong);
+      border-radius: 7px;
+      color: var(--cust-text);
+      padding: 12px 13px;
+      min-height: 44px;
+      box-shadow: 0 1px 0 rgba(18,25,38,0.02);
+    }
+    #customerScreen textarea { min-height: 78px; resize: vertical; }
+    #customerScreen input:focus,
+    #customerScreen select:focus,
+    #customerScreen textarea:focus {
+      border-color: var(--cust-focus);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
+    }
+
+    #customerScreen .btn-auth,
+    #customerScreen .btn {
+      border-radius: 7px;
+      min-height: 42px;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+    }
+    #customerScreen .btn-auth {
+      border: 1px solid var(--cust-border-strong);
+      background: rgba(255,255,255,0.86);
+      color: #344054;
+      padding: 9px 14px;
+    }
+    #customerScreen .btn-auth:hover { background: #111827; border-color: #111827; color: #fff; }
+    #customerScreen .btn-auth.btn-admin { background: var(--cust-primary); border-color: var(--cust-primary); color: #fff; }
+    #customerScreen .btn-auth.btn-orders { background: #111827; border-color: #111827; color: #fff; }
+    #customerScreen .btn-auth.btn-logout { background: transparent; border-color: var(--cust-border-strong); color: var(--cust-muted); }
+    #customerScreen .btn { padding: 13px 24px; }
+    #customerScreen .btn-primary,
+    #customerScreen .btn-submit {
+      background: var(--cust-primary);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(180,35,24,0.18);
+    }
+    #customerScreen .btn-primary:hover,
+    #customerScreen .btn-submit:hover { background: var(--cust-primary-dark); }
+    #customerScreen .btn-outline {
+      background: #fff;
+      border: 1px solid var(--cust-border-strong);
+      color: #344054;
+    }
+    #customerScreen .btn-outline:hover { background: #111827; border-color: #111827; color: #fff; }
+
+    #customerScreen .company-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    #customerScreen .company-card,
+    #customerScreen .acc-card,
+    #customerScreen .uniform-block,
+    #customerScreen .summary-block,
+    #customerScreen .price-summary-block,
+    #customerScreen .discount-progress-wrap,
+    #customerScreen .surcharge-banner,
+    #customerScreen .discount-banner {
+      border-color: var(--cust-border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(18,25,38,0.04);
+      overflow: hidden;
+    }
+    #customerScreen .company-card {
+      min-height: 96px;
+      background: #fff;
+      padding: 18px;
+    }
+    #customerScreen .company-card:hover {
+      border-color: var(--cust-primary);
+      transform: translateY(-1px);
+      box-shadow: var(--cust-shadow-soft);
+    }
+    #customerScreen .company-card.selected {
+      background: #111827;
+      border-color: #111827;
+      color: #fff;
+    }
+    #customerScreen .company-name { font-weight: 800; font-size: 14px; }
+    #customerScreen .company-sub { margin-top: 2px; color: inherit; opacity: 0.68; }
+    #customerScreen .company-logo {
+      width: 46px;
+      height: 46px;
+      border: 2px solid rgba(255,255,255,0.5);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+    }
+    #customerScreen .check-badge { top: 12px; right: 12px; }
+
+    #customerScreen .uniform-head { padding: 13px 18px; }
+    #customerScreen .uniform-body { padding: 8px 18px 18px; }
+    #customerScreen .garment-row {
+      grid-template-columns: 30px minmax(190px, 230px) 1fr;
+      gap: 16px;
+      padding: 18px 0;
+    }
+    #customerScreen .garment-label { font-weight: 800; color: #1f2937; }
+    #customerScreen .size-tab,
+    #customerScreen .shoe-size-tab {
+      background: var(--cust-surface-soft);
+      border: 1px solid var(--cust-border);
+      border-radius: 999px;
+      padding: 7px 12px;
+    }
+    #customerScreen .size-tab.sel,
+    #customerScreen .shoe-size-tab.sel {
+      background: #111827;
+      border-color: #111827;
+      color: #fff;
+    }
+    #customerScreen .qty-btn,
+    #customerScreen .qty-num-box {
+      border-color: var(--cust-border-strong);
+      background: #fff;
+    }
+    #customerScreen .qty-btn:first-child { border-radius: 7px 0 0 7px; }
+    #customerScreen .qty-btn:last-child { border-radius: 0 7px 7px 0; }
+
+    #customerScreen .acc-card { background: #fff; }
+    #customerScreen .acc-card-header { padding: 16px; }
+    #customerScreen .acc-card-header:hover { background: var(--cust-surface-soft); }
+    #customerScreen .acc-card.selected { border-color: var(--cust-primary); }
+    #customerScreen .acc-card.selected .acc-card-header { background: #fff7f6; }
+    #customerScreen .acc-icon {
+      width: 42px;
+      height: 42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: #f2f4f7;
+      border-radius: 8px;
+    }
+
+    #customerScreen .summary-head,
+    #customerScreen .order-card-head {
+      background: var(--cust-surface-soft);
+      border-bottom-color: var(--cust-border);
+    }
+    #customerScreen .price-summary-block { border: 1px solid #111827; }
+    #customerScreen .price-summary-head { background: #111827; }
+    #customerScreen .site-footer {
+      background: #fff;
+      border-top: 1px solid var(--cust-border);
+      color: var(--cust-muted);
+      padding: 16px 40px;
+    }
+
     /* Responsive */
     @media(max-width:900px){ .adm-stats{grid-template-columns:repeat(2,1fr)} .adm-main{padding:20px} }
-    @media(max-width:640px){ .page-header{padding:20px} .section-body{padding:20px 16px} .field-grid{grid-template-columns:1fr} .company-grid{grid-template-columns:1fr} .acc-grid{grid-template-columns:1fr} .garment-row{grid-template-columns:28px 1fr} .garment-right{grid-column:1/-1} .steps .step-label{display:none} .adm-stats{grid-template-columns:1fr 1fr} .adm-form-grid{grid-template-columns:1fr} }
+    @media(max-width:900px){
+      #customerScreen .page-header { align-items:flex-start; }
+      .header-aside { align-items:flex-start; width:100%; }
+      .service-strip { justify-content:flex-start; }
+      #customerScreen .company-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media(max-width:640px){
+      .page-header{padding:20px}
+      .section-body{padding:20px 16px}
+      .field-grid{grid-template-columns:1fr}
+      .company-grid{grid-template-columns:1fr}
+      .acc-grid{grid-template-columns:1fr}
+      .garment-row{grid-template-columns:28px 1fr}
+      .garment-right{grid-column:1/-1}
+      .steps .step-label{display:none}
+      .adm-stats{grid-template-columns:1fr 1fr}
+      .adm-form-grid{grid-template-columns:1fr}
+      #customerScreen .brand { font-size: 40px; }
+      #customerScreen .page-header { margin-bottom: 16px; padding: 24px 18px 18px; }
+      #customerScreen .form-wrap { padding: 0 14px 30px; }
+      #customerScreen .steps { top: 0; }
+      #customerScreen .step { justify-content:center; padding: 10px 6px; }
+      #customerScreen .company-grid { grid-template-columns:1fr; }
+      #customerScreen .section-body { padding: 22px 16px; }
+      #customerScreen .garment-row { grid-template-columns: 28px 1fr; }
+      #customerScreen .nav-row { gap: 12px; }
+      #customerScreen .nav-row .btn { flex: 1; padding-inline: 14px; }
+      #customerScreen .site-footer { padding: 16px 18px; flex-direction:column; gap:6px; text-align:center; }
+    }
   </style>
 </head>
 <body>
@@ -453,15 +786,19 @@
 <div id="customerScreen" class="screen active">
   <div class="top-banner">Uniform &amp; Accessories Order Form — 2026</div>
   <div class="page-header">
-    <div>
+    <div class="brand-panel">
       <div class="brand">DIVINE<span>UNIFORM</span></div>
       <div class="page-sub">Garments &amp; Accessories Requirement Form</div>
+      <div class="header-note">Order uniforms and accessories for fuel retail teams with clear sizing, quantity, GST, and delivery details in one place.</div>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+    <div class="header-aside">
       <div id="authBar" class="auth-bar"></div>
-      <div style="font-size:12px;color:var(--muted);text-align:right;line-height:1.8;">
-        Serving: Indian Oil · HP · BP · JIO-BP · Nayara<br/>
-        Fill all required fields marked <span style="color:var(--red)">*</span>
+      <div class="service-strip" aria-label="Supported companies">
+        <span class="service-chip">Indian Oil</span>
+        <span class="service-chip">HP</span>
+        <span class="service-chip">BP</span>
+        <span class="service-chip">JIO-BP</span>
+        <span class="service-chip">Nayara</span>
       </div>
     </div>
   </div>
