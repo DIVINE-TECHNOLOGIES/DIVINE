@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DIVINE UNIFORM</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1114,8 +1115,11 @@
 // ═══════════════════════════════════════════════════════════
 //  CONSTANTS & CONFIG
 // ═══════════════════════════════════════════════════════════
-const ADMIN_USER = 'MOHD';
-const ADMIN_PASS = 'Ayan@2115';
+const SUPABASE_URL = 'https://njjszyrkkpfsxdqopusw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qanN6eXJra3Bmc3hkcW9wdXN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDY2MDYsImV4cCI6MjA5MzI4MjYwNn0.bgeOk6ISkXDIN2IzO-pPd6SCROjNfWCof3EVKGtF1_0';
+const supabaseClient = window.supabase && !SUPABASE_URL.includes('YOUR_PROJECT_REF')
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 const MOQ_THRESHOLD = 20;
 const SMALL_QTY_SURCHARGE = 0.07;
@@ -1163,41 +1167,99 @@ const CO_META = {
 };
 
 // ═══════════════════════════════════════════════════════════
-//  DATABASE (localStorage as persistent store)
+//  DATABASE (Supabase RPC backend)
 // ═══════════════════════════════════════════════════════════
 const DB = {
-  // Customers
-  getCustomers(){ try{return JSON.parse(localStorage.getItem('du_customers')||'{}')}catch(e){return{}} },
-  saveCustomers(d){ localStorage.setItem('du_customers',JSON.stringify(d)) },
-  getCustomer(phone){ return this.getCustomers()[phone]||null },
-  upsertCustomer(data){
-    const d = this.getCustomers();
-    d[data.phone] = {...(d[data.phone]||{}), ...data};
-    this.saveCustomers(d);
+  ordersCache: [],
+  customersCache: [],
+
+  ready(){
+    if(!supabaseClient){
+      throw new Error('Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in INDEX.HTML.');
+    }
+  },
+  async rpc(fn,args={}){
+    this.ready();
+    const { data, error } = await supabaseClient.rpc(fn,args);
+    if(error) throw new Error(error.message || 'Supabase request failed.');
+    return data;
   },
 
-  // Orders
-  getOrders(){ try{return JSON.parse(localStorage.getItem('du_orders')||'[]')}catch(e){return[]} },
-  saveOrders(arr){ localStorage.setItem('du_orders',JSON.stringify(arr)) },
-  addOrder(order){
-    const orders = this.getOrders();
-    orders.unshift(order);
-    this.saveOrders(orders);
+  async loginCustomer(phone,password){
+    const data = await this.rpc('login_customer',{p_phone:phone,p_password:password});
+    this.setSession({token:data.token, phone:data.customer.phone, name:data.customer.name});
+    return data.customer;
   },
-  updateOrder(ref, patch){
-    const orders = this.getOrders();
-    const idx = orders.findIndex(o=>o.ref===ref);
-    if(idx>=0){ orders[idx]={...orders[idx],...patch}; this.saveOrders(orders); }
+  async signupCustomer(data){
+    const res = await this.rpc('signup_customer',{
+      p_name:data.name, p_org:data.org, p_phone:data.phone, p_gst:data.gst || '',
+      p_email:data.email || '', p_addr:data.addr, p_password:data.password
+    });
+    this.setSession({token:res.token, phone:res.customer.phone, name:res.customer.name});
+    return res.customer;
   },
-  getOrder(ref){ return this.getOrders().find(o=>o.ref===ref)||null },
+  async getCurrentCustomer(){
+    const session=this.getSession();
+    if(!session?.token)return null;
+    return await this.rpc('get_current_customer',{p_token:session.token});
+  },
+  async getCustomerOrders(){
+    const session=this.getSession();
+    if(!session?.token)return [];
+    return await this.rpc('list_customer_orders',{p_token:session.token});
+  },
+  async addOrder(order){
+    const session=this.getSession();
+    const saved = await this.rpc('create_customer_order',{
+      p_order:order,
+      p_session_token:session?.token || null
+    });
+    this.ordersCache.unshift(saved);
+    return saved;
+  },
+
+  async adminLogin(username,password){
+    const data = await this.rpc('login_admin',{p_username:username,p_password:password});
+    this.setAdminSession({token:data.token, username:data.username});
+    return data;
+  },
+  async getOrders(){
+    const admin=this.getAdminSession();
+    if(!admin?.token)return [];
+    this.ordersCache = await this.rpc('admin_list_orders',{p_admin_token:admin.token});
+    return [...this.ordersCache];
+  },
+  async getCustomers(){
+    const admin=this.getAdminSession();
+    if(!admin?.token)return [];
+    this.customersCache = await this.rpc('admin_list_customers',{p_admin_token:admin.token});
+    return [...this.customersCache];
+  },
+  async updateOrder(ref, patch){
+    const admin=this.getAdminSession();
+    const saved = await this.rpc('admin_update_order',{p_admin_token:admin.token,p_ref:ref,p_patch:patch});
+    const idx=this.ordersCache.findIndex(o=>o.ref===ref);
+    if(idx>=0)this.ordersCache[idx]=saved;
+    return saved;
+  },
+  async getOrder(ref){
+    const admin=this.getAdminSession();
+    return await this.rpc('admin_get_order',{p_admin_token:admin.token,p_ref:ref});
+  },
+  async addManualOrder(order){
+    const admin=this.getAdminSession();
+    const saved = await this.rpc('admin_add_order',{p_admin_token:admin.token,p_order:order});
+    this.ordersCache.unshift(saved);
+    return saved;
+  },
 
   // Session
   getSession(){ try{return JSON.parse(sessionStorage.getItem('du_session')||'null')}catch(e){return null} },
   setSession(data){ sessionStorage.setItem('du_session',JSON.stringify(data)) },
   clearSession(){ sessionStorage.removeItem('du_session') },
 
-  getAdminSession(){ return sessionStorage.getItem('du_admin')==='1' },
-  setAdminSession(){ sessionStorage.setItem('du_admin','1') },
+  getAdminSession(){ try{return JSON.parse(sessionStorage.getItem('du_admin')||'null')}catch(e){return null} },
+  setAdminSession(data){ sessionStorage.setItem('du_admin',JSON.stringify(data)) },
   clearAdminSession(){ sessionStorage.removeItem('du_admin') }
 };
 
@@ -1469,7 +1531,7 @@ function buildSummary(){
 }
 
 // ── SUBMIT ──
-function submitForm(){
+async function submitForm(){
   const ref='ORD-'+Date.now().toString(36).toUpperCase();
   const moqMet=isMOQMet(); let garmentSubBase=0, garmentSubEffective=0;
   state.companies.forEach(co=>{ if(!state.garments[co])return; Object.entries(state.garments[co]).forEach(([gid,gd])=>{ if(!gd.enabled)return; const ep=getEffectiveGarmentPrice(gid); Object.entries(gd.sizes).forEach(([,q])=>{garmentSubBase+=q*PRICES[gid];garmentSubEffective+=q*ep}) }) });
@@ -1480,7 +1542,6 @@ function submitForm(){
   let garmentSummary=[];
   state.companies.forEach(co=>{ GARMENTS.forEach(g=>{ const gd=state.garments[co]?.[g.id]; if(!gd?.enabled)return; const s=Object.entries(gd.sizes).map(([sz,q])=>sz+'x'+q).join(', '); if(s)garmentSummary.push(CO_META[co].name+' '+g.label+': '+s) }) });
 
-  // Save to DB
   const session=DB.getSession();
   const order={
     ref, name:state.customer.name, org:state.customer.org, phone:state.customer.phone,
@@ -1491,12 +1552,11 @@ function submitForm(){
     status:'pending', notes:'',
     customerPhone:session?session.phone:state.customer.phone
   };
-  DB.addOrder(order);
-
-  // Also update customer's order list if logged in
-  if(session){
-    const cust=DB.getCustomer(session.phone);
-    if(cust){ const orders=(cust.orders||[]); orders.unshift({ref,date:order.date,grandTotal,summary:order.summary}); DB.upsertCustomer({...cust,orders}) }
+  try {
+    await DB.addOrder(order);
+  } catch (err) {
+    alert(err.message || 'Could not save order. Please try again.');
+    return;
   }
 
   // WhatsApp
@@ -1549,50 +1609,53 @@ function switchTab(tab){
   document.getElementById('signupMsg').textContent='';
 }
 
-function doLogin(){
+async function doLogin(){
   const phone=document.getElementById('l_phone').value.trim();
   const pass=document.getElementById('l_pass').value;
   const msg=document.getElementById('loginMsg');
   if(!phone||!pass){msg.textContent='Please fill in all fields.';return}
-  const cust=DB.getCustomer(phone);
-  if(!cust||cust.password!==btoa(pass)){msg.textContent='Incorrect mobile number or password.';return}
-  DB.setSession({phone,name:cust.name});
-  closeModal('authModal');
-  renderAuthBar();
-  prefillCustomerDetails(cust);
-  showNotice('Welcome back, '+cust.name.split(' ')[0]+'! Your details have been filled in.');
+  try {
+    const cust=await DB.loginCustomer(phone,pass);
+    closeModal('authModal');
+    renderAuthBar();
+    prefillCustomerDetails(cust);
+    showNotice('Welcome back, '+cust.name.split(' ')[0]+'! Your details have been filled in.');
+  } catch (err) {
+    msg.textContent=err.message || 'Login failed.';
+  }
 }
 
-function doSignup(){
+async function doSignup(){
   const name=document.getElementById('s_name').value.trim(), org=document.getElementById('s_org').value.trim();
   const phone=document.getElementById('s_phone').value.trim(), gst=document.getElementById('s_gst').value.trim();
   const email=document.getElementById('s_email').value.trim(), addr=document.getElementById('s_addr').value.trim();
   const pass=document.getElementById('s_pass').value;
   const msg=document.getElementById('signupMsg');
   if(!name||!org||!phone||!addr||!pass){msg.textContent='Please fill all required fields.';return}
-  if(DB.getCustomer(phone)){msg.textContent='Mobile already registered. Please login.';return}
-  const newCustomer={name,org,phone,gst,email,addr,password:btoa(pass),orders:[]};
-  DB.upsertCustomer(newCustomer);
-  DB.setSession({phone,name});
-  closeModal('authModal');
-  renderAuthBar();
-  prefillCustomerDetails(newCustomer);
-  showNotice('Account created! Your details have been filled in automatically.');
+  try {
+    const newCustomer=await DB.signupCustomer({name,org,phone,gst,email,addr,password:pass});
+    closeModal('authModal');
+    renderAuthBar();
+    prefillCustomerDetails(newCustomer);
+    showNotice('Account created! Your details have been filled in automatically.');
+  } catch (err) {
+    msg.textContent=err.message || 'Could not create account.';
+  }
 }
 
 function doLogout(){ DB.clearSession(); renderAuthBar() }
 
-function doAdminLogin(){
+async function doAdminLogin(){
   const u=document.getElementById('a_user').value.trim();
   const p=document.getElementById('a_pass').value;
   const msg=document.getElementById('adminMsg');
   if(!u||!p){msg.textContent='Please enter username and password.';return}
-  if(u===ADMIN_USER&&p===ADMIN_PASS){
-    DB.setAdminSession();
+  try {
+    await DB.adminLogin(u,p);
     closeModal('authModal');
     switchToAdmin();
-  } else {
-    msg.textContent='Invalid admin credentials.';
+  } catch (err) {
+    msg.textContent=err.message || 'Invalid admin credentials.';
     document.getElementById('a_pass').value='';
   }
 }
@@ -1630,16 +1693,23 @@ function renderAuthBar(){
   }
 }
 
-function openOrders(){
+async function openOrders(){
   const session=DB.getSession(); if(!session)return;
-  const orders=DB.getOrders().filter(o=>o.customerPhone===session.phone||o.phone===session.phone);
   const body=document.getElementById('ordersBody');
+  body.innerHTML='<div class="no-orders">Loading orders...</div>';
+  openModal('ordersModal');
+  let orders=[];
+  try {
+    orders=await DB.getCustomerOrders();
+  } catch (err) {
+    body.innerHTML=`<div class="no-orders">${escHtml(err.message || 'Could not load orders.')}</div>`;
+    return;
+  }
   if(!orders.length){ body.innerHTML='<div class="no-orders"><div style="font-size:40px;margin-bottom:12px;">📦</div><div style="font-weight:600;color:var(--text);margin-bottom:6px;">No orders yet</div></div>'; }
   else{
     const iconMap={pending:'⏳',delivered:'✅',cancelled:'✕'};
     body.innerHTML=orders.map(o=>`<div class="order-card"><div class="order-card-head"><div><div class="order-ref">${o.ref}</div><div class="order-date">${o.date}</div></div><div style="display:flex;align-items:center;gap:10px;"><span class="order-status-pill pill-${o.status||'pending'}">${iconMap[o.status||'pending']} ${o.status||'pending'}</span><div class="order-total">${formatINR(o.grandTotal)}</div></div></div><div class="order-card-body">${escHtml(o.summary)}</div></div>`).join('');
   }
-  openModal('ordersModal');
 }
 
 function showNotice(text){
@@ -1655,10 +1725,20 @@ function showNotice(text){
 let admFilter='all';
 let admDetailRef=null;
 
-function renderAdminDashboard(){ renderAdmStats(); renderAdmTable(); renderAdmCustomers() }
+async function renderAdminDashboard(){
+  try {
+    const orders=await DB.getOrders();
+    const customers=await DB.getCustomers();
+    renderAdmStats(orders);
+    renderAdmTable(orders);
+    renderAdmCustomers(customers,orders);
+  } catch (err) {
+    showToast(err.message || 'Could not load dashboard.','err');
+    if(String(err.message || '').toLowerCase().includes('session')) adminLogout();
+  }
+}
 
-function renderAdmStats(){
-  const all=DB.getOrders();
+function renderAdmStats(all=DB.ordersCache){
   document.getElementById('aStatTotal').textContent=all.length;
   document.getElementById('aStatPending').textContent=all.filter(o=>(o.status||'pending')==='pending').length;
   document.getElementById('aStatDelivered').textContent=all.filter(o=>o.status==='delivered').length;
@@ -1673,9 +1753,9 @@ function setAdmFilter(f,el){
   renderAdmTable();
 }
 
-function renderAdmTable(){
+function renderAdmTable(sourceOrders=DB.ordersCache){
   const tbody=document.getElementById('admOrdersBody');
-  let orders=DB.getOrders();
+  let orders=[...sourceOrders];
   const q=(document.getElementById('admSearch').value||'').toLowerCase().trim();
   if(q) orders=orders.filter(o=>(o.name||'').toLowerCase().includes(q)||(o.ref||'').toLowerCase().includes(q)||(o.org||'').toLowerCase().includes(q)||(o.phone||'').toLowerCase().includes(q));
   if(admFilter!=='all') orders=orders.filter(o=>(o.status||'pending')===admFilter);
@@ -1707,11 +1787,10 @@ function renderAdmTable(){
   });
 }
 
-function renderAdmCustomers(){
+function renderAdmCustomers(sourceCustomers=DB.customersCache, sourceOrders=DB.ordersCache){
   const tbody=document.getElementById('admCustBody');
-  const customers=DB.getCustomers();
-  const allOrders=DB.getOrders();
-  const list=Object.values(customers);
+  const allOrders=sourceOrders;
+  const list=[...sourceCustomers];
   document.getElementById('admCustEmpty').style.display=list.length?'none':'block';
   tbody.innerHTML='';
   list.forEach(c=>{
@@ -1728,14 +1807,25 @@ function renderAdmCustomers(){
   });
 }
 
-function quickStatus(ref,status){
-  DB.updateOrder(ref,{status});
-  renderAdminDashboard();
-  showToast('Order '+ref+' → '+status, status==='delivered'?'success':'info');
+async function quickStatus(ref,status){
+  try {
+    await DB.updateOrder(ref,{status});
+    renderAdminDashboard();
+    showToast('Order '+ref+' → '+status, status==='delivered'?'success':'info');
+  } catch (err) {
+    showToast(err.message || 'Could not update order.','err');
+  }
 }
 
-function openAdmDetail(ref){
-  const o=DB.getOrder(ref); if(!o)return;
+async function openAdmDetail(ref){
+  let o;
+  try {
+    o=await DB.getOrder(ref);
+  } catch (err) {
+    showToast(err.message || 'Could not open order.','err');
+    return;
+  }
+  if(!o)return;
   admDetailRef=ref;
   const status=o.status||'pending';
   const icons={pending:'⏳',delivered:'✅',cancelled:'✕'};
@@ -1760,27 +1850,38 @@ function openAdmDetail(ref){
   openAdmModal('admDetailModal');
 }
 
-function detailStatus(status){
+async function detailStatus(status){
   if(!admDetailRef)return;
-  DB.updateOrder(admDetailRef,{status});
-  renderAdminDashboard();
-  openAdmDetail(admDetailRef);
-  showToast('Status → '+status, status==='delivered'?'success':'info');
+  try {
+    await DB.updateOrder(admDetailRef,{status});
+    renderAdminDashboard();
+    openAdmDetail(admDetailRef);
+    showToast('Status → '+status, status==='delivered'?'success':'info');
+  } catch (err) {
+    showToast(err.message || 'Could not update order.','err');
+  }
 }
 
+let noteSaveTimer=null;
 function saveDetailNote(){
   if(!admDetailRef)return;
-  DB.updateOrder(admDetailRef,{notes:document.getElementById('ad_notes').value});
+  clearTimeout(noteSaveTimer);
+  const notes=document.getElementById('ad_notes').value;
+  noteSaveTimer=setTimeout(async()=>{
+    try { await DB.updateOrder(admDetailRef,{notes}); }
+    catch (err) { showToast(err.message || 'Could not save note.','err'); }
+  },500);
 }
 
 function openAdmAdd(){ clearAdmAddForm(); openAdmModal('admAddModal') }
 function clearAdmAddForm(){ ['ma_name','ma_org','ma_phone','ma_email','ma_gst','ma_amount','ma_addr','ma_reqdate','ma_po','ma_summary'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''}); document.getElementById('ma_status').value='pending' }
 
-function submitManualOrder(){
+async function submitManualOrder(){
   const name=document.getElementById('ma_name').value.trim(), org=document.getElementById('ma_org').value.trim(), phone=document.getElementById('ma_phone').value.trim();
   if(!name||!org||!phone){showToast('Fill Name, Org & Phone.','err');return}
   const ref='ORD-'+Date.now().toString(36).toUpperCase();
-  DB.addOrder({
+  try {
+    await DB.addManualOrder({
     ref, name, org, phone,
     email:document.getElementById('ma_email').value.trim(), gst:document.getElementById('ma_gst').value.trim(),
     addr:document.getElementById('ma_addr').value.trim(), reqdate:document.getElementById('ma_reqdate').value.trim(),
@@ -1788,9 +1889,12 @@ function submitManualOrder(){
     grandTotal:parseFloat(document.getElementById('ma_amount').value)||0,
     date:new Date().toLocaleDateString('en-IN'),
     status:document.getElementById('ma_status').value, notes:'', customerPhone:phone
-  });
-  closeAdmModal('admAddModal'); renderAdminDashboard();
-  showToast('Order '+ref+' added.','success');
+    });
+    closeAdmModal('admAddModal'); renderAdminDashboard();
+    showToast('Order '+ref+' added.','success');
+  } catch (err) {
+    showToast(err.message || 'Could not add order.','err');
+  }
 }
 
 function switchAdmTab(tab,el){
@@ -1815,10 +1919,18 @@ function showToast(msg,type){
 // ═══════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════
-(function init(){
+(async function init(){
   renderAuthBar();
   const session=DB.getSession();
-  if(session){ const cust=DB.getCustomer(session.phone); if(cust)prefillCustomerDetails(cust) }
+  if(session){
+    try {
+      const cust=await DB.getCurrentCustomer();
+      if(cust)prefillCustomerDetails(cust);
+      else DB.clearSession();
+    } catch (err) {
+      showNotice(err.message || 'Supabase is not configured yet.');
+    }
+  }
   if(DB.getAdminSession()){ switchToAdmin(); return }
   document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open')}));
   document.querySelectorAll('.adm-modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open')}));
