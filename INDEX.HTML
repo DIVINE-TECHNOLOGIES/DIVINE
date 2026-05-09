@@ -1279,6 +1279,78 @@ function getTotalGarmentQty(){
 function isMOQMet(){ return getTotalGarmentQty()>=MOQ_THRESHOLD }
 function getEffectiveGarmentPrice(gid){ const b=PRICES[gid]; return isMOQMet()?b:Math.round(b*(1+SMALL_QTY_SURCHARGE)*100)/100 }
 
+function getAccessoryOrderLines(){
+  const lines=[];
+  Object.entries(state.accessories).forEach(([accId,data])=>{
+    const acc=ACCESSORIES.find(a=>a.id===accId);
+    if(!acc || !data)return;
+    if(acc.hasSize){
+      Object.entries(data).forEach(([co,sizes])=>{
+        if(!state.companies.includes(co))return;
+        const meta=CO_META[co];
+        if(!meta)return;
+        const parts=Object.entries(sizes||{})
+          .filter(([,q])=>Number(q)>0)
+          .map(([sz,q])=>({label:`UK${sz}×${q}`, qty:Number(q)}));
+        if(parts.length){
+          const qty=parts.reduce((sum,p)=>sum+p.qty,0);
+          lines.push({
+            accId, co, name:acc.name, icon:acc.icon, company:meta.name,
+            detail:parts.map(p=>p.label).join(', '), qty,
+            total:qty*PRICES[accId]
+          });
+        }
+      });
+    } else {
+      Object.entries(data).forEach(([co,q])=>{
+        if(!state.companies.includes(co))return;
+        const qty=Number(q)||0;
+        const meta=CO_META[co];
+        if(qty>0 && meta){
+          lines.push({
+            accId, co, name:acc.name, icon:acc.icon, company:meta.name,
+            detail:String(qty), qty, total:qty*PRICES[accId]
+          });
+        }
+      });
+    }
+  });
+  return lines;
+}
+
+function getSelectedAccessoriesPayload(){
+  const payload={};
+  Object.entries(state.accessories).forEach(([accId,data])=>{
+    const acc=ACCESSORIES.find(a=>a.id===accId);
+    if(!acc || !data)return;
+    state.companies.forEach(co=>{
+      if(!(co in data))return;
+      if(acc.hasSize){
+        const sizes={};
+        Object.entries(data[co]||{}).forEach(([sz,q])=>{
+          const qty=Number(q)||0;
+          if(qty>0)sizes[sz]=qty;
+        });
+        if(Object.keys(sizes).length){
+          if(!payload[accId])payload[accId]={};
+          payload[accId][co]=sizes;
+        }
+      } else {
+        const qty=Number(data[co])||0;
+        if(qty>0){
+          if(!payload[accId])payload[accId]={};
+          payload[accId][co]=qty;
+        }
+      }
+    });
+  });
+  return payload;
+}
+
+function hasOrderItems(){
+  return getTotalGarmentQty()>0 || getAccessoryOrderLines().length>0;
+}
+
 function updateDiscountUI(){
   const qty=getTotalGarmentQty(); const moqMet=qty>=MOQ_THRESHOLD; const pct=Math.min((qty/MOQ_THRESHOLD)*100,100);
   const sb=document.getElementById('surchargeBanner'), db=document.getElementById('discountBanner'), pr=document.getElementById('discountProgress');
@@ -1502,15 +1574,12 @@ function buildSummary(){
     html+=`<div class="summary-block"><div class="summary-head" style="border-left:4px solid ${CO_META[co].color};">${CO_META[co].name} — Uniforms</div><div class="summary-body">${rows}</div></div>`;
   });
 
-  const accKeys=Object.keys(state.accessories); let accSubtotal=0;
-  if(accKeys.length){
+  const accessoryLines=getAccessoryOrderLines(); let accSubtotal=0;
+  if(accessoryLines.length){
     let accRows='';
-    accKeys.forEach(id=>{
-      const acc=ACCESSORIES.find(a=>a.id===id); let lineTotal=0, detail='';
-      if(acc.hasSize){ const parts=[]; Object.entries(state.accessories[id]).forEach(([co,sizes])=>{const s=Object.entries(sizes).map(([sz,q])=>{lineTotal+=q*PRICES[id];return`UK${sz}×${q}`}).join(', ');if(s)parts.push(`${CO_META[co].name}: ${s}`)}); detail=parts.join(' | ')||'—'; }
-      else{ const parts=[]; Object.entries(state.accessories[id]).forEach(([co,q])=>{if(q>0){lineTotal+=q*PRICES[id];parts.push(`${CO_META[co].name}: ${q}`)}}); detail=parts.join(' · ')||'—'; }
-      accSubtotal+=lineTotal;
-      accRows+=`<div class="summary-row"><span class="summary-key">${acc.icon} ${acc.name} <span style="font-size:10px;">(${formatINR(PRICES[id])}/pc)</span></span><span class="summary-val">${detail}${lineTotal>0?` = <strong>${formatINR(lineTotal)}</strong>`:''}</span></div>`;
+    accessoryLines.forEach(line=>{
+      accSubtotal+=line.total;
+      accRows+=`<div class="summary-row"><span class="summary-key">${line.icon} ${line.company} ${line.name} <span style="font-size:10px;">(${formatINR(PRICES[line.accId])}/pc)</span></span><span class="summary-val">${line.detail} = <strong>${formatINR(line.total)}</strong></span></div>`;
     });
     html+=`<div class="summary-block"><div class="summary-head">🎒 Accessories</div><div class="summary-body">${accRows}</div></div>`;
   }
@@ -1532,6 +1601,7 @@ function buildSummary(){
 
 // ── SUBMIT ──
 async function submitForm(){
+  if(!hasOrderItems()){ alert('Please select at least one garment or accessory before submitting.'); return; }
   const ref='ORD-'+Date.now().toString(36).toUpperCase();
   const moqMet=isMOQMet(); let garmentSubBase=0, garmentSubEffective=0;
   state.companies.forEach(co=>{ if(!state.garments[co])return; Object.entries(state.garments[co]).forEach(([gid,gd])=>{ if(!gd.enabled)return; const ep=getEffectiveGarmentPrice(gid); Object.entries(gd.sizes).forEach(([,q])=>{garmentSubBase+=q*PRICES[gid];garmentSubEffective+=q*ep}) }) });
@@ -1542,12 +1612,17 @@ async function submitForm(){
   let garmentSummary=[];
   state.companies.forEach(co=>{ GARMENTS.forEach(g=>{ const gd=state.garments[co]?.[g.id]; if(!gd?.enabled)return; const s=Object.entries(gd.sizes).map(([sz,q])=>sz+'x'+q).join(', '); if(s)garmentSummary.push(CO_META[co].name+' '+g.label+': '+s) }) });
 
+  const accessoryLines=getAccessoryOrderLines();
+  const accessoriesSummary=accessoryLines.map(line=>`${line.company} ${line.name}: ${line.detail}`);
+
   const session=DB.getSession();
   const order={
     ref, name:state.customer.name, org:state.customer.org, phone:state.customer.phone,
     email:state.customer.email||'', gst:state.customer.gst||'', addr:state.customer.addr,
     reqdate:state.customer.date||'', po:state.customer.po||'',
-    grandTotal, summary:garmentSummary.join(' | ')||'No garments',
+    grandTotal,
+    summary:(garmentSummary.join(' | ')||'No garments') + (accessoriesSummary.length?` | Accessories: ${accessoriesSummary.join(' | ')}`:''),
+    accessories: getSelectedAccessoriesPayload(),
     date:new Date().toLocaleDateString('en-IN'),
     status:'pending', notes:'',
     customerPhone:session?session.phone:state.customer.phone
@@ -1569,6 +1644,11 @@ async function submitForm(){
   if(state.customer.po) msg+=`*PO:* ${state.customer.po}%0A`;
   msg+=`%0A`;
   state.companies.forEach(co=>{ let lines=''; GARMENTS.forEach(g=>{ const gd=state.garments[co]?.[g.id]; if(!gd?.enabled)return; const s=Object.entries(gd.sizes).map(([sz,q])=>`${sz}×${q}`).join(', '); if(s)lines+=`• ${g.label}: ${s}%0A` }); if(lines)msg+=`*${CO_META[co].name}:*%0A${lines}%0A` });
+  if(accessoryLines.length){
+    msg+=`*Accessories:*%0A`;
+    accessoryLines.forEach(line=>{ msg+=`• ${line.company} ${line.name}: ${line.detail}%0A`; });
+    msg+=`%0A`;
+  }
   if(!moqMet&&surchargeAmount>0) msg+=`%0A*⚠️ Small Qty Surcharge (+7%25):* +₹${Math.round(surchargeAmount).toLocaleString('en-IN')}%0A`;
   msg+=`%0A*Total (incl. GST 5%25):* ₹${Math.round(grandTotal).toLocaleString('en-IN')}%0A*Order Ref: ${ref}*`;
   window.open(`https://wa.me/919811417786?text=${msg}`);
@@ -1581,9 +1661,7 @@ async function submitForm(){
 }
 
 function calcAccessorySubtotal(){
-  let t=0;
-  Object.entries(state.accessories).forEach(([id,data])=>{ Object.entries(data).forEach(([,val])=>{ if(typeof val==='number')t+=val*PRICES[id]; else Object.values(val).forEach(q=>{if(typeof q==='number')t+=q*PRICES[id]}) }) });
-  return t;
+  return getAccessoryOrderLines().reduce((sum,line)=>sum+line.total,0);
 }
 
 // ═══════════════════════════════════════════════════════════

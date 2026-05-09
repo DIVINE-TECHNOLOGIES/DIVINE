@@ -34,10 +34,18 @@ create table if not exists public.divine_orders (
   notes text,
   customer_phone text,
   order_date text,
+  -- Stores complex order details sent from the frontend.
+  -- Includes accessories selection too (e.g. state.accessories).
   payload jsonb not null default '{}'::jsonb,
+  accessories jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.divine_orders
+  add column if not exists payload jsonb not null default '{}'::jsonb,
+  add column if not exists accessories jsonb not null default '[]'::jsonb;
+
 
 create table if not exists public.divine_admins (
   id uuid primary key default gen_random_uuid(),
@@ -120,7 +128,14 @@ as $$
     'date', coalesce(o.order_date, to_char(o.created_at at time zone 'Asia/Kolkata', 'DD/MM/YYYY')),
     'status', coalesce(o.status, 'pending'),
     'notes', coalesce(o.notes, ''),
-    'customerPhone', coalesce(o.customer_phone, o.phone)
+    'customerPhone', coalesce(o.customer_phone, o.phone),
+    'accessories', case
+      when o.accessories is not null
+       and o.accessories <> '[]'::jsonb
+       and o.accessories <> '{}'::jsonb
+        then o.accessories
+      else coalesce(o.payload->'accessories', '[]'::jsonb)
+    end
   );
 $$;
 
@@ -261,7 +276,7 @@ begin
 
   insert into public.divine_orders(
     ref, name, org, phone, email, gst, addr, reqdate, po, grand_total,
-    summary, status, notes, customer_phone, order_date, payload
+    summary, status, notes, customer_phone, order_date, payload, accessories
   )
   values (
     p_order->>'ref',
@@ -279,7 +294,11 @@ begin
     coalesce(p_order->>'notes', ''),
     coalesce(v_phone, nullif(p_order->>'customerPhone', ''), p_order->>'phone'),
     coalesce(nullif(p_order->>'date', ''), to_char(now() at time zone 'Asia/Kolkata', 'DD/MM/YYYY')),
-    p_order
+    p_order,
+    case
+      when p_order ? 'accessories' then p_order->'accessories'
+      else '[]'::jsonb
+    end
   )
   returning * into v_order;
 
